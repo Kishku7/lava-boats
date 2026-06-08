@@ -6,8 +6,11 @@ Method:
   * Match the boat's Value distribution to the plank's (mean + contrast) so the
     overall tone lands where the planks are (deep crimson / teal warped) instead
     of staying birch-pale. Relative shading/detail is preserved.
-  * Index hue+saturation by the *remapped* value so dark areas pick up the plank's
-    dark tones and highlights pick up its highlights.
+  * Index hue+saturation by the *remapped* value.
+  * For chest boats, the chest itself is left as the original (it reads as a normal
+    chest). The chest is detected by saturation (the orange chest wood is far more
+    saturated than the pale hull), with the embedded metal lock filled in via a
+    bounded flood-fill so the whole chest blob is preserved.
 Albedo only; _n (normal) and _s (specular) PBR maps are copied unchanged.
 """
 import os
@@ -23,16 +26,17 @@ PLANKS = {
     "warped":  os.path.join(RB, "block", "warped_planks.png"),
 }
 
+# (source, dest, preserve_chest)
 def jobs(wood):
     return [
         (os.path.join(RB, "entity", "boat", "birch.png"),
-         os.path.join(MOD, "entity", "boat", f"{wood}.png")),
+         os.path.join(MOD, "entity", "boat", f"{wood}.png"), False),
         (os.path.join(RB, "entity", "chest_boat", "birch.png"),
-         os.path.join(MOD, "entity", "chest_boat", f"{wood}.png")),
+         os.path.join(MOD, "entity", "chest_boat", f"{wood}.png"), True),
         (os.path.join(RB, "item", "birch_boat.png"),
-         os.path.join(MOD, "item", f"{wood}_boat.png")),
+         os.path.join(MOD, "item", f"{wood}_boat.png"), False),
         (os.path.join(RB, "item", "birch_chest_boat.png"),
-         os.path.join(MOD, "item", f"{wood}_chest_boat.png")),
+         os.path.join(MOD, "item", f"{wood}_chest_boat.png"), True),
     ]
 
 PBR_SRC_DST = [
@@ -45,6 +49,8 @@ PBR_SRC_DST = [
     (("item", "birch_chest_boat_n.png"),      ("item", "{w}_chest_boat_n.png")),
     (("item", "birch_chest_boat_s.png"),      ("item", "{w}_chest_boat_s.png")),
 ]
+
+CHEST_SAT_THRESHOLD = 110  # hull sits ~100; chest orange wood is well above
 
 def circ_mean_255(hues_255):
     ang = hues_255.astype(np.float64) / 255.0 * 2.0 * np.pi
@@ -60,17 +66,44 @@ def build_lut(plank_path):
     for v in range(256):
         mask = V == v
         if mask.sum() >= 1:
-            lut_h[v] = circ_mean_255(H[mask])
-            lut_s[v] = S[mask].mean()
+            lut_h[v] = circ_mean_255(H[mask]); lut_s[v] = S[mask].mean()
     filled = np.where(lut_s >= 0)[0]
     for v in range(256):
         if lut_s[v] < 0:
             nn = filled[np.argmin(np.abs(filled - v))]
             lut_h[v] = lut_h[nn]; lut_s[v] = lut_s[nn]
-    # plank value stats (weighted toward the mid-body, ignore pure black/!alpha none here)
     return lut_h, lut_s, float(V.mean()), float(V.std() + 1e-6)
 
-def recolor(src_path, dst_path, lut_h, lut_s, plank_vmean, plank_vstd, sat_boost=1.0):
+def chest_mask(rgba):
+    """Mask of the chest (orange wood + embedded lock) for preservation."""
+    a = rgba[..., 3]; op = a > 8
+    S = np.asarray(Image.fromarray(rgba[..., :3], "RGB").convert("HSV"))[..., 1]
+    core = op & (S > CHEST_SAT_THRESHOLD)
+    if core.sum() == 0:
+        return np.zeros(op.shape, bool)
+    ys, xs = np.where(core)
+    m = 6
+    y0 = max(0, ys.min() - m); y1 = min(op.shape[0] - 1, ys.max() + m)
+    x0 = max(0, xs.min() - m); x1 = min(op.shape[1] - 1, xs.max() + m)
+    region = np.zeros(op.shape, bool); region[y0:y1 + 1, x0:x1 + 1] = True
+    region &= ~core  # candidate background/holes inside bbox
+    # flood from bbox border through non-core cells; whatever isn't reached is an enclosed hole
+    bg = np.zeros(op.shape, bool)
+    bg[y0, x0:x1 + 1] |= region[y0, x0:x1 + 1]; bg[y1, x0:x1 + 1] |= region[y1, x0:x1 + 1]
+    bg[y0:y1 + 1, x0] |= region[y0:y1 + 1, x0]; bg[y0:y1 + 1, x1] |= region[y0:y1 + 1, x1]
+    while True:
+        up = np.zeros_like(bg); up[:-1, :] = bg[1:, :]
+        dn = np.zeros_like(bg); dn[1:, :] = bg[:-1, :]
+        lf = np.zeros_like(bg); lf[:, :-1] = bg[:, 1:]
+        rt = np.zeros_like(bg); rt[:, 1:] = bg[:, :-1]
+        nb = (bg | up | dn | lf | rt) & region
+        if int(nb.sum()) == int(bg.sum()):
+            break
+        bg = nb
+    holes = region & ~bg
+    return core | holes
+
+def recolor(src_path, dst_path, lut_h, lut_s, plank_vmean, plank_vstd, preserve_chest=False):
     img = Image.open(src_path).convert("RGBA")
     rgba = np.asarray(img)
     alpha = rgba[..., 3]
@@ -81,25 +114,25 @@ def recolor(src_path, dst_path, lut_h, lut_s, plank_vmean, plank_vstd, sat_boost
         src_mean = V[opaque].mean(); src_std = V[opaque].std() + 1e-6
     else:
         src_mean, src_std = V.mean(), V.std() + 1e-6
-    # match boat value distribution to plank's (keeps relative shading, shifts tone)
-    Vout = (V - src_mean) * (plank_vstd / src_std) + plank_vmean
-    Vout = np.clip(Vout, 0, 255)
+    Vout = np.clip((V - src_mean) * (plank_vstd / src_std) + plank_vmean, 0, 255)
     idx = Vout.astype(np.int32)
-    new_h = lut_h[idx]
-    new_s = np.clip(lut_s[idx] * sat_boost, 0, 255)
-    out_hsv = np.stack([new_h, new_s, Vout], axis=-1).astype(np.uint8)
+    out_hsv = np.stack([lut_h[idx], lut_s[idx], Vout], axis=-1).astype(np.uint8)
     out_rgb = np.asarray(Image.fromarray(out_hsv, "HSV").convert("RGB"))
     out = np.dstack([out_rgb, alpha]).astype(np.uint8)
+    if preserve_chest:
+        cm = chest_mask(rgba)
+        out[cm] = rgba[cm]
     os.makedirs(os.path.dirname(dst_path), exist_ok=True)
     Image.fromarray(out, "RGBA").save(dst_path)
-    return img.size
+    return img.size, (int(chest_mask(rgba).sum()) if preserve_chest else 0)
 
 def main():
     for wood, plank in PLANKS.items():
         lut_h, lut_s, vmean, vstd = build_lut(plank)
-        for src, dst in jobs(wood):
-            size = recolor(src, dst, lut_h, lut_s, vmean, vstd)
-            print(f"  recolor {wood:8s} {os.path.basename(dst):26s} {size}  plankV(mean={vmean:.0f},std={vstd:.0f})")
+        for src, dst, pc in jobs(wood):
+            size, cpx = recolor(src, dst, lut_h, lut_s, vmean, vstd, pc)
+            note = f"  (chest preserved: {cpx} px)" if pc else ""
+            print(f"  recolor {wood:8s} {os.path.basename(dst):26s} {size}{note}")
         for src_t, dst_t in PBR_SRC_DST:
             src = os.path.join(RB, *src_t)
             dst = os.path.join(MOD, *[p.format(w=wood) for p in dst_t])
