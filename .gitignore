@@ -25,3 +25,6 @@ run/
 *-pid.txt
 probe.gradle
 cp.log
+
+# local-only: references credential path, never publish
+tools/modrinth_publish.py
