@@ -1,25 +1,33 @@
 """
-Recolor birch boat artwork to crimson / warped, matching the RB_128x plank palettes.
+Recolor base (birch) boat artwork to Crimson / Warped, matching plank palettes.
+
+Inputs (a resource pack containing, under assets/minecraft/textures/):
+  entity/boat/birch.png(+_n,_s), entity/chest_boat/birch.png(+_n,_s),
+  item/birch_boat.png(+_n,_s), item/birch_chest_boat.png(+_n,_s),
+  block/crimson_planks.png, block/warped_planks.png
+Point at the pack with the RB_PACK env var or the first CLI arg
+(default: a folder named "RB_128x" next to where you run this).
 
 Method:
-  * Build a brightness(V) -> (Hue, Saturation) lookup from the plank texture.
-  * Match the boat's Value distribution to the plank's (mean + contrast) so the
-    overall tone lands where the planks are (deep crimson / teal warped) instead
-    of staying birch-pale. Relative shading/detail is preserved.
-  * Index hue+saturation by the *remapped* value.
-  * For chest boats, the chest itself is left as the original (it reads as a normal
-    chest). The chest is detected by saturation (the orange chest wood is far more
-    saturated than the pale hull), with the embedded metal lock filled in via a
-    bounded flood-fill so the whole chest blob is preserved.
-Albedo only; _n (normal) and _s (specular) PBR maps are copied unchanged.
+  * Build a brightness(V) -> (Hue, Saturation) lookup from each plank texture.
+  * Match the boat's Value distribution to the plank's (mean + contrast) so the tone
+    lands on the plank colour while keeping the boat's shading/detail.
+  * On chest boats, the chest is left as the original (it reads as a normal chest):
+    detected by saturation, with the metal lock filled in via a bounded flood-fill.
+Albedo only; the _n (normal) and _s (specular) PBR maps are copied unchanged.
+
+Output goes into this mod's assets, resolved relative to this script.
 """
 import os
+import sys
 import shutil
 import numpy as np
 from PIL import Image
 
-RB = r"C:\Users\user\Local_Research\Minecraft\resourcePacks\RB_128x\assets\minecraft\textures"
-MOD = r"C:\Users\user\Local_Research\Minecraft\mods\lava-boats\src\main\resources\assets\lavaboats\textures"
+PACK = os.environ.get("RB_PACK") or (sys.argv[1] if len(sys.argv) > 1 else "RB_128x")
+RB = os.path.join(PACK, "assets", "minecraft", "textures")
+HERE = os.path.dirname(os.path.abspath(__file__))
+MOD = os.path.normpath(os.path.join(HERE, "..", "src", "main", "resources", "assets", "lavaboats", "textures"))
 
 PLANKS = {
     "crimson": os.path.join(RB, "block", "crimson_planks.png"),
@@ -75,7 +83,6 @@ def build_lut(plank_path):
     return lut_h, lut_s, float(V.mean()), float(V.std() + 1e-6)
 
 def chest_mask(rgba):
-    """Mask of the chest (orange wood + embedded lock) for preservation."""
     a = rgba[..., 3]; op = a > 8
     S = np.asarray(Image.fromarray(rgba[..., :3], "RGB").convert("HSV"))[..., 1]
     core = op & (S > CHEST_SAT_THRESHOLD)
@@ -86,8 +93,7 @@ def chest_mask(rgba):
     y0 = max(0, ys.min() - m); y1 = min(op.shape[0] - 1, ys.max() + m)
     x0 = max(0, xs.min() - m); x1 = min(op.shape[1] - 1, xs.max() + m)
     region = np.zeros(op.shape, bool); region[y0:y1 + 1, x0:x1 + 1] = True
-    region &= ~core  # candidate background/holes inside bbox
-    # flood from bbox border through non-core cells; whatever isn't reached is an enclosed hole
+    region &= ~core
     bg = np.zeros(op.shape, bool)
     bg[y0, x0:x1 + 1] |= region[y0, x0:x1 + 1]; bg[y1, x0:x1 + 1] |= region[y1, x0:x1 + 1]
     bg[y0:y1 + 1, x0] |= region[y0:y1 + 1, x0]; bg[y0:y1 + 1, x1] |= region[y0:y1 + 1, x1]
@@ -100,8 +106,7 @@ def chest_mask(rgba):
         if int(nb.sum()) == int(bg.sum()):
             break
         bg = nb
-    holes = region & ~bg
-    return core | holes
+    return core | (region & ~bg)
 
 def recolor(src_path, dst_path, lut_h, lut_s, plank_vmean, plank_vstd, preserve_chest=False):
     img = Image.open(src_path).convert("RGBA")
@@ -124,15 +129,14 @@ def recolor(src_path, dst_path, lut_h, lut_s, plank_vmean, plank_vstd, preserve_
         out[cm] = rgba[cm]
     os.makedirs(os.path.dirname(dst_path), exist_ok=True)
     Image.fromarray(out, "RGBA").save(dst_path)
-    return img.size, (int(chest_mask(rgba).sum()) if preserve_chest else 0)
+    return img.size
 
 def main():
     for wood, plank in PLANKS.items():
         lut_h, lut_s, vmean, vstd = build_lut(plank)
         for src, dst, pc in jobs(wood):
-            size, cpx = recolor(src, dst, lut_h, lut_s, vmean, vstd, pc)
-            note = f"  (chest preserved: {cpx} px)" if pc else ""
-            print(f"  recolor {wood:8s} {os.path.basename(dst):26s} {size}{note}")
+            size = recolor(src, dst, lut_h, lut_s, vmean, vstd, pc)
+            print(f"  recolor {wood:8s} {os.path.basename(dst):26s} {size}")
         for src_t, dst_t in PBR_SRC_DST:
             src = os.path.join(RB, *src_t)
             dst = os.path.join(MOD, *[p.format(w=wood) for p in dst_t])
