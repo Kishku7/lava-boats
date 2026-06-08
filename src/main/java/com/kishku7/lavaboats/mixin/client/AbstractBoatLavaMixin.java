@@ -25,18 +25,19 @@ import net.minecraft.world.level.material.FluidState;
  *    make those checks also accept lava, so the vanilla {@code floatBoat()} /
  *    {@code controlBoat()} logic treats lava like water (buoyancy + full speed).
  *
- * 2) Lava boats float a little higher than the default water equilibrium so the hull
- *    rests on the lava surface and the rider's body stays out of the lava (no flames,
- *    no lava filling the boat). Done by nudging {@code waterLevel} up in {@code floatBoat}
- *    while the boat is over lava.
+ * 2) A small buoyancy boost on lava. The hull bottom STAYS submerged (so buoyancy is
+ *    stable - no bouncing), but the boat rides high enough that its interior floor and
+ *    the rider sit above the lava surface. The boost must stay below the natural
+ *    submersion (~0.366) or the equilibrium would rise above the surface, lose
+ *    buoyancy, and oscillate.
  *
  * Client-only because the controlling client is authoritative for a ridden boat.
  */
 @Mixin(AbstractBoat.class)
 public abstract class AbstractBoatLavaMixin {
 
-    /** How far above the water-equilibrium a lava boat rides (blocks). Keeps the rider clear of lava. */
-    private static final double LAVA_FLOAT_BOOST = 0.42;
+    /** Lava ride boost (blocks). Must stay < ~0.366 so the hull bottom remains submerged (stable). */
+    private static final double LAVA_FLOAT_BOOST = 0.20;
 
     @Shadow
     private double waterLevel;
@@ -64,10 +65,12 @@ public abstract class AbstractBoatLavaMixin {
         if (!ModEntities.isLavaBoat(self.getType())) {
             return;
         }
-        // Only boost while sitting over lava (block at the hull base is lava). This is
-        // stable across the float equilibrium, so it won't oscillate like an isInLava() gate.
+        // Stable gate: lava in the block at the hull base OR just below it. This stays
+        // true across the whole float range, so there's no on/off force discontinuity
+        // (which is what caused the earlier bouncing).
         BlockPos base = BlockPos.containing(self.getX(), self.getY(), self.getZ());
-        if (self.level().getFluidState(base).is(FluidTags.LAVA)) {
+        if (self.level().getFluidState(base).is(FluidTags.LAVA)
+                || self.level().getFluidState(base.below()).is(FluidTags.LAVA)) {
             this.waterLevel += LAVA_FLOAT_BOOST;
         }
     }
