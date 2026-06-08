@@ -38,7 +38,8 @@ public final class ModItems {
     private static Item registerBoatItem(String name, EntityType<? extends AbstractBoat> type) {
         Identifier id = Identifier.fromNamespaceAndPath(LavaBoats.MOD_ID, name);
         ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, id);
-        Item item = new BoatItem(type, new Item.Properties().stacksTo(1).setId(key));
+        // fireResistant() = the Netherite mechanism: the dropped item survives fire & lava.
+        Item item = new BoatItem(type, new Item.Properties().stacksTo(1).fireResistant().setId(key));
         return Registry.register(BuiltInRegistries.ITEM, id, item);
     }
 }
