@@ -1,0 +1,27 @@
+# gradle
+.gradle/
+build/
+out/
+classes/
+
+# eclipse / idea / vscode
+*.launch
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+bin/
+
+# fabric / loom
+run/
+
+# build / run transient logs + pids
+*.log
+*.err
+*-pid.txt
+probe.gradle
+cp.log
