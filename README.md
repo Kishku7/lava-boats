@@ -6,7 +6,22 @@ Ride lava like it's water.
 float and steer on lava exactly the way ordinary boats do on water. The boats never burn, their
 passengers never catch fire, and a dropped boat bobs back up to the lava surface instead of sinking.
 
-Built for **Minecraft 26.1.2** on **Fabric**.
+Now available across **four mod loaders and three Minecraft versions** — Fabric, Quilt, Forge, and
+NeoForge, on Minecraft 1.20.1, 1.21.11, and 26.1.2.
+
+## Supported platforms
+
+| Minecraft | Fabric | Quilt | Forge | NeoForge |
+| --- | :---: | :---: | :---: | :---: |
+| **1.20.1** | ✅ | ✅ | ✅ | ✅ |
+| **1.21.11** | ✅ | — | — | ✅ |
+| **26.1.2** | ✅ | — | — | ✅ |
+
+One source, every modern loader. On 1.20.1 the family covers 1.20–1.20.4; Quilt runs the Fabric
+build. On the newer versions Mojang's engine narrows the field to Fabric + NeoForge (Quilt has no
+mappings for them yet, and classic Forge ends at 1.20.x). Grab the jar that matches your loader and
+Minecraft version from the [Releases](https://github.com/Kishku7/lava-boats/releases) page or
+[Modrinth](https://modrinth.com/mod/lava-boats).
 
 ## Features
 
@@ -18,6 +33,8 @@ Built for **Minecraft 26.1.2** on **Fabric**.
 - **Safe passengers** — anyone riding a lava boat takes no fire or lava damage and shows no flames.
 - **Floating drops** — break a boat over lava (or drop one in) and the item rises straight back to
   the surface, fire-resistant like Netherite.
+- **Recipes unlocked on join** — the boat recipes appear in your recipe book the moment you enter a
+  world, so they're easy to find.
 - **High-quality art** — 128× boat textures with PBR (normal + specular) maps, recoloured to match
   the Crimson and Warped plank palettes. The chest on a chest boat still looks like a chest.
 
@@ -35,10 +52,17 @@ Lava Boats.
 
 ## Installation
 
-Requires [**Fabric Loader**](https://fabricmc.net/) and [**Fabric API**](https://modrinth.com/mod/fabric-api).
+Drop the jar that matches your loader and Minecraft version into your `mods/` folder, along with its
+dependencies:
 
-Drop the `lava-boats-*.jar` into your `mods/` folder. Works in singleplayer and on both client and
-server:
+| Platform | Required dependencies |
+| --- | --- |
+| Fabric / Quilt | [Fabric API](https://modrinth.com/mod/fabric-api) |
+| Fabric / NeoForge on 1.20.1 & 1.21.11 | [Architectury API](https://modrinth.com/mod/architectury-api) |
+| Forge 1.20.1 | [Architectury API](https://modrinth.com/mod/architectury-api) |
+| NeoForge 26.1.2 | *(none)* |
+
+Works in singleplayer and on servers:
 
 - **Server** — install it so the boats exist and the fire protection applies to everyone.
 - **Client** — install it to ride the lava and see the boats.
@@ -54,13 +78,16 @@ The boats appear in the **Tools & Utilities** creative tab next to the vanilla b
 
 ## Building from source
 
+Each Minecraft version lives on its own branch (`main` = newest; `*-<version>` branches for the
+others). From a branch:
+
 ```sh
 ./gradlew build
 ```
 
-The jar is written to `build/libs/`. The boat textures are generated from a base resource pack by
-`tools/recolor_boats.py` — see the header of that script for the inputs it expects (a pack
-containing the vanilla boat art plus the Crimson/Warped plank textures).
+The jars are written to each module's `build/libs/`. The boat textures are generated from a base
+resource pack by `tools/recolor_boats.py` — see the header of that script for the inputs it expects
+(a pack containing the vanilla boat art plus the Crimson/Warped plank textures).
 
 ## License
 
