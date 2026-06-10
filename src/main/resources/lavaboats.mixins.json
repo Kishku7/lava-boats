@@ -8,9 +8,8 @@
   },
   "mixins": [
     "EntityFireImmuneMixin",
-    "ItemEntityLavaFloatMixin"
-  ],
-  "client": [
+    "ItemEntityLavaFloatMixin",
+    "LavaDepthStriderMixin",
     "client.AbstractBoatLavaMixin"
   ]
 }

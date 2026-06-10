@@ -28,6 +28,7 @@ Minecraft version from the [Releases](https://github.com/Kishku7/lava-boats/rele
 - **Four new boats** — Crimson and Warped, each with a chest variant — crafted from their matching
   nether-stem planks just like vanilla boats (5 planks for a boat; chest + boat for a chest boat).
 - **Lava travel** — nether-stem boats float on the lava surface and move at full water speed. Place
+- **Depth Strider in lava** � Depth Strider boots carry over to lava, speeding you through it just like water and scaling with the enchantment level. *(Minecraft 1.21.11 and 26.1.2)*
   one on lava and go.
 - **Fireproof** — the boats are immune to fire and lava; they won't burn or break.
 - **Safe passengers** — anyone riding a lava boat takes no fire or lava damage and shows no flames.
