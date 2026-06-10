@@ -1,0 +1,14 @@
+pluginManagement {
+    repositories {
+        maven { url "https://maven.fabricmc.net/" }
+        maven { url "https://maven.architectury.dev/" }
+        maven { url "https://maven.minecraftforge.net/" }
+        gradlePluginPortal()
+    }
+}
+include("common")
+include("fabric")
+// forge temporarily disabled — Architectury-Loom 1.7-SNAPSHOT regressed Forge platform wiring
+// (forge() no longer creates the forge config). Re-enable once loom is pinned to a forge-capable build.
+// include("forge")
+rootProject.name = "lava-boats"

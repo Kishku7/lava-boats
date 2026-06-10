@@ -1,0 +1,82 @@
+plugins {
+    id 'eclipse'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'org.spongepowered.mixin' version '0.7.+'
+}
+
+version = '1.1.2+1.20.4'
+group = 'com.kishku7.lavaboats'
+base { archivesName = 'lava-boats' }
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+repositories {
+    maven { url = 'https://maven.architectury.dev/' }
+    maven { url = 'https://maven.fabricmc.net/' }
+    maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+}
+
+// Standalone FG6 Forge build that shares the Architectury common + forge source (TK4J-proven route).
+// Architectury runtime is provided by the user's installed Architectury mod (declared in mods.toml).
+sourceSets {
+    main {
+        java.srcDirs = ['../common/src/main/java', '../forge/src/main/java']
+        resources.srcDirs = ['../common/src/main/resources', '../forge/src/main/resources']
+    }
+}
+
+minecraft {
+    mappings channel: 'official', version: '1.20.1'
+    copyIdeResources = true
+}
+
+mixin {
+    add sourceSets.main, 'lavaboats.refmap.json'
+    config 'lavaboats-common.mixins.json'
+    config 'lavaboats-common-client.mixins.json'
+    config 'lavaboats-forge.mixins.json'
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.20.1-47.3.0'
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    // (without this, only the plain @Inject mixins get SRG mappings -> the others fail at runtime).
+
+    // Architectury (DeferredRegister/RegistrySupplier used by the shared common code).
+    implementation fg.deobf('dev.architectury:architectury-forge:9.2.14')
+    // Compile-only: @Environment annotation used by the shared common client class (ignored by Forge at runtime).
+    compileOnly 'net.fabricmc:fabric-loader:0.16.10'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('META-INF/mods.toml') {
+        expand version: project.version
+    }
+    // MixinGradle does not inject the refmap reference into configs that come from a shared srcDir,
+    // so add it explicitly (Forge/NeoForge need it to load the SRG mappings -> "No refMap loaded" otherwise).
+    doLast {
+        def resDir = layout.buildDirectory.dir('resources/main').get().asFile
+        ['lavaboats-common.mixins.json', 'lavaboats-common-client.mixins.json', 'lavaboats-forge.mixins.json'].each { n ->
+            def f = new File(resDir, n)
+            if (f.exists()) {
+                def j = new groovy.json.JsonSlurper().parse(f)
+                j.refmap = 'lavaboats.refmap.json'
+                f.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(j))
+            }
+        }
+    }
+}
+
+jar {
+    archiveClassifier = 'forge'
+    manifest {
+        attributes([
+            'MixinConfigs': 'lavaboats-common.mixins.json,lavaboats-common-client.mixins.json,lavaboats-forge.mixins.json'
+        ])
+    }
+}

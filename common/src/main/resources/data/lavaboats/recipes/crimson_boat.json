@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "boat",
+  "key": {
+    "#": { "item": "minecraft:crimson_planks" }
+  },
+  "pattern": [
+    "# #",
+    "###"
+  ],
+  "result": { "item": "lavaboats:crimson_boat", "count": 1 }
+}

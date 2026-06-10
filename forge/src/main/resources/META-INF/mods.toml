@@ -1,0 +1,46 @@
+modLoader = "javafml"
+loaderVersion = "[47,)"
+license = "ARR"
+issueTrackerURL = "https://github.com/Kishku7/lava-boats/issues"
+
+[[mods]]
+modId = "lavaboats"
+version = "${version}"
+displayName = "Lava Boats"
+authors = "Kishku7"
+description = '''
+Adds Crimson and Warped boats (with chest variants) that ride on lava like water, never burn, and protect their passengers from fire. Install on the server for the protection features; install on clients for full lava-riding capability.
+'''
+logoFile = "icon.png"
+
+# Mixin configs are wired via the jar manifest 'MixinConfigs' attribute (set by Architectury/Loom
+# for Forge) AND referenced here so NeoForge 1.20.1 (which loads this Forge jar) also picks them up.
+[[mixins]]
+config = "lavaboats-common.mixins.json"
+
+[[mixins]]
+config = "lavaboats-common-client.mixins.json"
+
+[[mixins]]
+config = "lavaboats-forge.mixins.json"
+
+[[dependencies.lavaboats]]
+    modId = "forge"
+    mandatory = true
+    versionRange = "[47,)"
+    ordering = "NONE"
+    side = "BOTH"
+
+[[dependencies.lavaboats]]
+    modId = "minecraft"
+    mandatory = true
+    versionRange = "[1.20,1.20.4]"
+    ordering = "NONE"
+    side = "BOTH"
+
+[[dependencies.lavaboats]]
+    modId = "architectury"
+    mandatory = true
+    versionRange = "[9.0,)"
+    ordering = "AFTER"
+    side = "BOTH"

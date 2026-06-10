@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "boat",
+  "key": {
+    "#": { "item": "minecraft:warped_planks" }
+  },
+  "pattern": [
+    "# #",
+    "###"
+  ],
+  "result": { "item": "lavaboats:warped_boat", "count": 1 }
+}

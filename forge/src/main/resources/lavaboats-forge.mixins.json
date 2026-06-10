@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.kishku7.lavaboats.forge.mixin.client",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "BoatFluidForgeMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

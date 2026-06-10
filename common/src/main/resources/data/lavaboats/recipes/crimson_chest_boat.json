@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "chest_boat",
+  "ingredients": [
+    { "item": "minecraft:chest" },
+    { "item": "lavaboats:crimson_boat" }
+  ],
+  "result": { "item": "lavaboats:crimson_chest_boat", "count": 1 }
+}
