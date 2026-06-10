@@ -2,22 +2,22 @@
 
 Ride lava like it's water.
 
-**Lava Boats** adds **Crimson** and **Warped** boats — in both regular and chest variants — that
+**Lava Boats** adds **Crimson** and **Warped** boats â€” in both regular and chest variants â€” that
 float and steer on lava exactly the way ordinary boats do on water. The boats never burn, their
 passengers never catch fire, and a dropped boat bobs back up to the lava surface instead of sinking.
 
-Now available across **four mod loaders and three Minecraft versions** — Fabric, Quilt, Forge, and
+Now available across **four mod loaders and three Minecraft versions** â€” Fabric, Quilt, Forge, and
 NeoForge, on Minecraft 1.20.1, 1.21.11, and 26.1.2.
 
 ## Supported platforms
 
 | Minecraft | Fabric | Quilt | Forge | NeoForge |
 | --- | :---: | :---: | :---: | :---: |
-| **1.20.1** | ✅ | ✅ | ✅ | ✅ |
-| **1.21.11** | ✅ | — | — | ✅ |
-| **26.1.2** | ✅ | — | — | ✅ |
+| **1.20.1** | âœ… | âœ… | âœ… | âœ… |
+| **1.21.11** | âœ… | â€” | â€” | âœ… |
+| **26.1.2** | âœ… | â€” | â€” | âœ… |
 
-One source, every modern loader. On 1.20.1 the family covers 1.20–1.20.4; Quilt runs the Fabric
+One source, every modern loader. On 1.20.1 the family covers 1.20â€“1.20.4; Quilt runs the Fabric
 build. On the newer versions Mojang's engine narrows the field to Fabric + NeoForge (Quilt has no
 mappings for them yet, and classic Forge ends at 1.20.x). Grab the jar that matches your loader and
 Minecraft version from the [Releases](https://github.com/Kishku7/lava-boats/releases) page or
@@ -25,18 +25,18 @@ Minecraft version from the [Releases](https://github.com/Kishku7/lava-boats/rele
 
 ## Features
 
-- **Four new boats** — Crimson and Warped, each with a chest variant — crafted from their matching
+- **Four new boats** â€” Crimson and Warped, each with a chest variant â€” crafted from their matching
   nether-stem planks just like vanilla boats (5 planks for a boat; chest + boat for a chest boat).
-- **Lava travel** — nether-stem boats float on the lava surface and move at full water speed. Place
-- **Depth Strider in lava** � Depth Strider boots carry over to lava, speeding you through it just like water and scaling with the enchantment level. *(Minecraft 1.21.11 and 26.1.2)*
+- **Lava travel** â€” nether-stem boats float on the lava surface and move at full water speed. Place
+- **Depth Strider in lava** — Depth Strider boots carry over to lava, speeding you through it just like water and scaling with the enchantment level. *(Minecraft 1.21.11 and 26.1.2)*
   one on lava and go.
-- **Fireproof** — the boats are immune to fire and lava; they won't burn or break.
-- **Safe passengers** — anyone riding a lava boat takes no fire or lava damage and shows no flames.
-- **Floating drops** — break a boat over lava (or drop one in) and the item rises straight back to
+- **Fireproof** â€” the boats are immune to fire and lava; they won't burn or break.
+- **Safe passengers** â€” anyone riding a lava boat takes no fire or lava damage and shows no flames.
+- **Floating drops** â€” break a boat over lava (or drop one in) and the item rises straight back to
   the surface, fire-resistant like Netherite.
-- **Recipes unlocked on join** — the boat recipes appear in your recipe book the moment you enter a
+- **Recipes unlocked on join** â€” the boat recipes appear in your recipe book the moment you enter a
   world, so they're easy to find.
-- **High-quality art** — 128× boat textures with PBR (normal + specular) maps, recoloured to match
+- **High-quality art** â€” 128Ã— boat textures with PBR (normal + specular) maps, recoloured to match
   the Crimson and Warped plank palettes. The chest on a chest boat still looks like a chest.
 
 ## How it works
@@ -46,7 +46,7 @@ lava-as-water buoyancy is a client-side tweak: the boat's fluid checks are taugh
 water for nether-stem boats, and vanilla's own float/steer logic does the rest, with a small lift so
 the rider sits clear of the surface. The fireproofing and passenger safety are server-side (the boat
 entities are registered fire-immune, and riders report as fire-immune while seated), so they protect
-everyone — even players without the mod, who simply won't get the lava buoyancy.
+everyone â€” even players without the mod, who simply won't get the lava buoyancy.
 
 No new networking and no custom packets, so a vanilla client can still connect to a server running
 Lava Boats.
@@ -65,8 +65,8 @@ dependencies:
 
 Works in singleplayer and on servers:
 
-- **Server** — install it so the boats exist and the fire protection applies to everyone.
-- **Client** — install it to ride the lava and see the boats.
+- **Server** â€” install it so the boats exist and the fire protection applies to everyone.
+- **Client** â€” install it to ride the lava and see the boats.
 
 ## Recipes
 
@@ -87,7 +87,7 @@ others). From a branch:
 ```
 
 The jars are written to each module's `build/libs/`. The boat textures are generated from a base
-resource pack by `tools/recolor_boats.py` — see the header of that script for the inputs it expects
+resource pack by `tools/recolor_boats.py` â€” see the header of that script for the inputs it expects
 (a pack containing the vanilla boat art plus the Crimson/Warped plank textures).
 
 ## License
