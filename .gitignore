@@ -1,0 +1,36 @@
+﻿# gradle / build
+.gradle/
+build/
+out/
+classes/
+bin/
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+*.launch
+
+# run / servers (may contain player data - never commit)
+run/
+runs/
+
+# transient logs / pids
+*.log
+*.log.done
+*.err
+*-pid.txt
+*.tmp
+probe.gradle
+cp.log
+
+# merge workspace (Forgix mutates inputs; build locally)
+merge-work/
+
+# local-only: references a credential path, never publish
+modrinth_publish.py
