@@ -1,0 +1,6 @@
+﻿{
+    "model":  {
+                  "type":  "minecraft:model",
+                  "model":  "lavaboats:item/crimson_chest_boat"
+              }
+}

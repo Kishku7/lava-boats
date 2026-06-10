@@ -1,0 +1,13 @@
+architectury {
+    common(rootProject.enabled_platforms.split(","))
+}
+
+loom {
+    accessWidenerPath = file("src/main/resources/lavaboats.accesswidener")
+}
+
+dependencies {
+    // fabric loader is required here for @Environment annotations and the mixin base.
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    modApi "dev.architectury:architectury:${rootProject.architectury_version}"
+}
