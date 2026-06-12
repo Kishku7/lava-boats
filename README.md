@@ -1,5 +1,7 @@
 # Lava Boats
 
+[![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.gg/NVcgJJRsx)
+
 Ride lava like it's water.
 
 Lava Boats adds Crimson and Warped boats (regular and chest variants) that float and
