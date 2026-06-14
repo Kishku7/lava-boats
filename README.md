@@ -1,5 +1,12 @@
 # Lava Boats
 
+## Branches
+
+- [26.2](https://github.com/Kishku7/lava-boats/tree/26.2)
+- [26.1.2](https://github.com/Kishku7/lava-boats/tree/26.1.2)
+- [1.21.11](https://github.com/Kishku7/lava-boats/tree/1.21.11)
+- [1.20.4](https://github.com/Kishku7/lava-boats/tree/1.20.4)
+
 [![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.gg/NVcgJJRsx)
 
 Ride lava like it's water.
