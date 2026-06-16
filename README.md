@@ -1,35 +1,15 @@
-# Lava Boats - Minecraft 26.2 (source branch)
+# Lava Boats - 26.2
 
-Crimson and Warped boats (plus chest variants) that ride on lava like water - they never burn and riders are fire-immune.
+Source for the Minecraft 26.2 pre-release line, organized loader-on-top: `Common/` (shared code), `Fabric/`, `Forge/`, `NeoForge/`, each with a subfolder per Minecraft version.
 
-This branch holds the **Minecraft 26.2** source. For the current stable release, see the
-[26.1.2 branch](https://github.com/Kishku7/lava-boats/tree/26.1.2).
+Standalone builds (no Architectury on 26.x).
 
-MC 26.x is unobfuscated (mojmap-native), so there is no Architectury - two independent per-loader trees:
+### `Fabric/`
 
-- `fabric/`   - fabric-loom.    Build: `cd fabric && ./gradlew build`
-- `neoforge/` - ModDevGradle.   Build: `cd neoforge && ./gradlew build` (see the NeoForge note below)
+- [`26.2`](Fabric/26.2/) - Minecraft 26.2 (pre-release)
 
-## Fabric
-Targets the MC 26.2 pre/rc line with Fabric API. Builds with the published Fabric 26.2 toolchain - no extra setup.
+### `NeoForge/`
 
-## NeoForge - requires a locally built NeoForge 26.2 (alpha)
-NeoForge has not published a 26.2 build, so `neoforge/` depends on a NeoForge 26.2 that you build yourself
-and publish to your local Maven. One time:
+- [`26.2`](NeoForge/26.2/) - Minecraft 26.2 (pre-release)
 
-1. `git clone --branch port/26.2 https://github.com/neoforged/NeoForge`
-2. Install **JDK 25** (the JDK the `port/26.2` branch requires).
-3. Build it and publish to your local Maven:
-
-       ./gradlew setup
-       ./gradlew :neoforge:publishToMavenLocal --no-configuration-cache
-
-   This publishes `net.neoforged:neoforge:26.2.0-alpha.0+<suffix>` into `~/.m2` (the suffix is timestamped).
-4. Set that exact version in `neoforge/gradle.properties` (`neo_version`), then `cd neoforge && ./gradlew build`.
-   (`neoforge/build.gradle` already includes `mavenLocal()`.)
-
-To **run** the NeoForge build, install that same locally built NeoForge (its `*-installer.jar`) into your
-launcher - there is no public NeoForge 26.2 to install yet.
-
-## Downloads (Modrinth, beta)
-https://modrinth.com/mod/lava-boats
+Client + server mod (Java 25). [Modrinth](https://modrinth.com/mod/lava-boats) - [Releases](https://github.com/Kishku7/lava-boats/releases) - overview: [`main`](https://github.com/Kishku7/lava-boats).
