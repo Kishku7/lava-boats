@@ -9,7 +9,7 @@ repositories {
     mavenCentral()
 }
 
-version = "${mod_version}+${minecraft_version}-neoforge"
+version = "${mod_version}+26.2-neoforge"
 group = 'com.kishku7.lavaboats'
 
 base {
