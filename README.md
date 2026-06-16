@@ -1,48 +1,35 @@
-# Lava Boats
+# Lava Boats - Minecraft 26.2 (source branch)
 
-## Branches
+Crimson and Warped boats (plus chest variants) that ride on lava like water - they never burn and riders are fire-immune.
 
-- [26.2](https://github.com/Kishku7/lava-boats/tree/26.2)
-- [26.1.2](https://github.com/Kishku7/lava-boats/tree/26.1.2)
-- [1.21.11](https://github.com/Kishku7/lava-boats/tree/1.21.11)
-- [1.20.4](https://github.com/Kishku7/lava-boats/tree/1.20.4)
+This branch holds the **Minecraft 26.2** source. For the current stable release, see the
+[26.1.2 branch](https://github.com/Kishku7/lava-boats/tree/26.1.2).
 
-[![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.gg/NVcgJJRsx)
+MC 26.x is unobfuscated (mojmap-native), so there is no Architectury - two independent per-loader trees:
 
-Ride lava like it's water.
+- `fabric/`   - fabric-loom.    Build: `cd fabric && ./gradlew build`
+- `neoforge/` - ModDevGradle.   Build: `cd neoforge && ./gradlew build` (see the NeoForge note below)
 
-Lava Boats adds Crimson and Warped boats (regular and chest variants) that float and
-steer on lava exactly like ordinary boats on water. They never burn, riders never catch
-fire, dropped boats bob back to the surface, and Depth Strider works in lava (1.21.11+).
-No custom packets - a vanilla client can still join a server running it.
+## Fabric
+Targets the MC 26.2 pre/rc line with Fabric API. Builds with the published Fabric 26.2 toolchain - no extra setup.
 
-## Supported platforms
+## NeoForge - requires a locally built NeoForge 26.2 (alpha)
+NeoForge has not published a 26.2 build, so `neoforge/` depends on a NeoForge 26.2 that you build yourself
+and publish to your local Maven. One time:
 
-Source for each Minecraft version lives on its own branch, named for the version.
-`main` (this branch) is just the overview.
+1. `git clone --branch port/26.2 https://github.com/neoforged/NeoForge`
+2. Install **JDK 25** (the JDK the `port/26.2` branch requires).
+3. Build it and publish to your local Maven:
 
-| Branch    | Minecraft       | Fabric | Quilt | Forge | NeoForge |
-| ---       | ---             | :---:  | :---: | :---: | :---:    |
-| `1.20.4`  | 1.20.1 - 1.20.4 | Yes    | Yes   | Yes   | Yes      |
-| `1.21.11` | 1.21.11         | Yes    | -     | -     | Yes      |
-| `26.1.2`  | 26.1.2          | Yes    | -     | -     | Yes      |
+       ./gradlew setup
+       ./gradlew :neoforge:publishToMavenLocal --no-configuration-cache
 
-On 1.20.1 Quilt runs the Fabric build and one universal jar serves all four loaders.
-Newer families are Fabric + NeoForge (Quilt lacks mappings, classic Forge ends at 1.20.x).
-Dependencies: Fabric API (Fabric/Quilt); Architectury API on 1.20.1 and 1.21.11; none on NeoForge 26.1.2.
+   This publishes `net.neoforged:neoforge:26.2.0-alpha.0+<suffix>` into `~/.m2` (the suffix is timestamped).
+4. Set that exact version in `neoforge/gradle.properties` (`neo_version`), then `cd neoforge && ./gradlew build`.
+   (`neoforge/build.gradle` already includes `mavenLocal()`.)
 
-## Building from source
+To **run** the NeoForge build, install that same locally built NeoForge (its `*-installer.jar`) into your
+launcher - there is no public NeoForge 26.2 to install yet.
 
-Check out the branch for your Minecraft version, then:
-
-    ./gradlew build                # 1.20.4 and 1.21.11 are multi-loader source trees
-    # 26.1.2 branch: cd fabric && ./gradlew build   (and cd neoforge && ./gradlew build)
-
-The 1.20.4 branch includes scripts/merge-universal.ps1 + BUILD.md for the universal jar.
-
-## Downloads
-
-- Releases: https://github.com/Kishku7/lava-boats/releases
-- Modrinth: https://modrinth.com/mod/lava-boats
-
-By Kishku7. All Rights Reserved.
+## Downloads (Modrinth, beta)
+https://modrinth.com/mod/lava-boats
