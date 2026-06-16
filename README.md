@@ -1,10 +1,15 @@
-﻿# Lava Boats - Minecraft 26.1.2 (source branch)
+# Lava Boats - 26.1
 
-MC 26.x ships unobfuscated (mojmap-native), so this branch does NOT use Architectury.
-Two independent per-loader source trees, each self-contained:
+Source for Minecraft 26.1, organized loader-on-top: `Common/` (shared code), `Fabric/`, `Forge/`, `NeoForge/`, each with a subfolder per Minecraft version.
 
-- fabric/    plain fabric-loom.        Build: cd fabric   && ./gradlew build
-- neoforge/  standalone ModDevGradle.  Build: cd neoforge && ./gradlew build
+Standalone builds (no Architectury on 26.x).
 
-Both require JDK 25. Shipped per-loader (no merge on 26.x).
-mod_version: 1.1.2+26.1.2 (fabric) / 1.1.2 (neoforge).
+### `Fabric/`
+
+- [`26.1.2`](Fabric/26.1.2/) - Minecraft 26.1.2
+
+### `NeoForge/`
+
+- [`26.1.2`](NeoForge/26.1.2/) - Minecraft 26.1.2
+
+Client + server mod (Java 25). [Modrinth](https://modrinth.com/mod/lava-boats) - [Releases](https://github.com/Kishku7/lava-boats/releases) - overview: [`main`](https://github.com/Kishku7/lava-boats).
