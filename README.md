@@ -1,13 +1,33 @@
-# Lava Boats - 26.1
+# Lava Boats - branch `26.1`
 
-Source for Minecraft 26.1. Each loader+version folder is a **standalone, self-contained build** - no Architectury, no shared `Common/` folder.
+Source for the Minecraft **26.1.2** line. Every loader+version folder is a **standalone, self-contained
+build** - no Architectury, no shared `Common/`. Client + server mod.
 
-### `Fabric/`
+## Platforms
 
-- [`26.1.2`](Fabric/26.1.2/) - Minecraft 26.1.2 (also runs on Quilt)
+- [`Fabric/`](Fabric) - 1 build(s); see its README for versions and exclusions.
+- [`NeoForge/`](NeoForge) - 1 build(s); see its README for versions and exclusions.
 
-### `NeoForge/`
+## Not supported on this line
 
-- [`26.1.2`](NeoForge/26.1.2/) - Minecraft 26.1.2
+- **Forge** is not built for the 26.x line - ForgeGradle 6 cannot build unobfuscated Minecraft 26.x and there is no FG7.
+- **Quilt** is not supported on the 26.x line - Quilt retired Quilted Fabric API at 26.1, so the Fabric API path Lava Boats uses on Fabric is no longer provided on Quilt for 26.x. (Quilt remains supported on the 1.20.x and 1.21.x branches.)
 
-Mod version 1.2.0. Client + server mod (Java 25). [Modrinth](https://modrinth.com/mod/lava-boats) - [Releases](https://github.com/Kishku7/lava-boats/releases) - overview: [`main`](https://github.com/Kishku7/lava-boats).
+## Build
+
+```
+cd <Loader>/<version>
+./gradlew build      # Windows: .\gradlew.bat build
+```
+
+Output: `build/libs/lava-boats-*.jar`. Requires JDK 25 (Minecraft 26.x toolchain).
+
+## Links
+
+- Other branches: [`1.20.x`](https://github.com/Kishku7/lava-boats/tree/1.20.x), [`1.21.x`](https://github.com/Kishku7/lava-boats/tree/1.21.x), [`26.2`](https://github.com/Kishku7/lava-boats/tree/26.2)
+- Overview: [`main`](https://github.com/Kishku7/lava-boats/tree/main)
+- Modrinth: https://modrinth.com/mod/lava-boats
+- Releases: https://github.com/Kishku7/lava-boats/releases
+- Discord: https://discord.gg/2ZxzbCzAHe
+
+By Kishku7. All Rights Reserved.
