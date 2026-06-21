@@ -30,6 +30,5 @@ Output: `build/libs/lava-boats-*.jar`. Requires JDK 25 (Minecraft 26.x toolchain
 - Overview: [`main`](https://github.com/Kishku7/lava-boats/tree/main)
 - Modrinth: https://modrinth.com/mod/lava-boats
 - Releases: https://github.com/Kishku7/lava-boats/releases
-- Discord: https://discord.gg/2ZxzbCzAHe
 
 By Kishku7. All Rights Reserved.
