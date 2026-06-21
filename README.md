@@ -2,7 +2,6 @@
 
 **Ride lava like it's water.** Lava Boats adds **Crimson and Warped boats** (regular and chest variants) that float and steer on lava exactly like ordinary boats on water. They never burn, riders never catch fire, dropped boats bob back to the surface, and Depth Strider works in lava (1.21.11+). No custom packets - a vanilla client can still join a server running it. Client + server mod.
 
-[![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.gg/2ZxzbCzAHe)
 
 ## Branches
 
@@ -44,6 +43,5 @@ Craft a **Crimson** or **Warped** boat from 5 matching nether-stem planks (chest
 
 - Releases: https://github.com/Kishku7/lava-boats/releases
 - Modrinth: https://modrinth.com/mod/lava-boats
-- Discord: https://discord.gg/2ZxzbCzAHe
 
 By Kishku7. All Rights Reserved.
