@@ -12,8 +12,7 @@ the overview.
 
 - [1.20.x](https://github.com/Kishku7/lava-boats/tree/1.20.x) - Minecraft 1.20.1 - 1.20.6
 - [1.21.x](https://github.com/Kishku7/lava-boats/tree/1.21.x) - Minecraft 1.21 - 1.21.11
-- [26.1](https://github.com/Kishku7/lava-boats/tree/26.1) - Minecraft 26.1.2
-- [26.2](https://github.com/Kishku7/lava-boats/tree/26.2) - Minecraft 26.2 (pre-release)
+- [26](https://github.com/Kishku7/lava-boats/tree/26) - Minecraft 26.1 -> 26.3-snapshot-1 (unified line; Fabric + NeoForge)
 
 ## Supported platforms
 
@@ -21,8 +20,7 @@ the overview.
 | --- | --- | --- | --- |
 | `1.20.x` (1.20.1 - 1.20.6)  | 1.20.1 - 1.20.6 (+ Quilt)  | 1.20.1, 1.20.5 - 1.20.6 | 1.20.1 - 1.20.6 (incl. 1.20.2 - 1.20.4) |
 | `1.21.x` (1.21 - 1.21.11)   | 1.21 - 1.21.11 (+ Quilt)   | 1.21 - 1.21.8 | 1.21 - 1.21.11 |
-| `26.1` (26.1.2)             | 26.1.2 (Fabric only) | - | 26.1.2 |
-| `26.2` (pre-release)        | 26.2 (Fabric only) | - | 26.2 |
+| `26` (unified 26.x) | 26.1 -> 26.3-snapshot-1 | - | 26.1.2 / 26.2 |
 
 - **Forge** is supported through **1.21.8** (the ForgeGradle 6 ceiling - no FG7). 1.21.9+ and all of 26.x
   are Fabric + NeoForge. The 1.20.2 - 1.20.4 range is covered on NeoForge (a dedicated gap build); a Forge
