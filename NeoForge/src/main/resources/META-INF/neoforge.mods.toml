@@ -22,13 +22,13 @@ config = "lavaboats-client.mixins.json"
 [[dependencies.lavaboats]]
 modId = "neoforge"
 type = "required"
-versionRange = "[26.1,)"
+versionRange = "${neoforgeRange}"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.lavaboats]]
 modId = "minecraft"
 type = "required"
-versionRange = "[26.1,)"
+versionRange = "${mcRange}"
 ordering = "NONE"
 side = "BOTH"
