@@ -59,5 +59,5 @@ modern11 (>=1.21.11 incl 26): Identifier rename, vehicle.boat package move, Boat
 - [x] Stage 0: pre-unify tags, branch, worktree, skeleton dirs
 - [x] Stage 1: _codegen brain + cog_sources + shared_minecraft convergence (merged brains + shared_legacy consolidation; 1.20 axes: RL ctor @<1.21, awardRecipesByKey array @<1.20.3, result item->id @1.20.5, renderToBuffer floats @<1.21; fapi EntityRenderers @>=1.21.9)
 - [x] Stage 2: ALL 42 JARS GREEN at 1.4.0, zero warnings (Fabric 10, NeoForge 19, Forge 13); era representatives boot-verified on all three loaders. Runtime-caught fixes: Forge 51 orphan line (no ctor injection -- classic .get() exactly there); Forge 49.2 RL-factory backport (loader-aware make_id); ctx injection 1.20.4+ except 1.21; Mixin-0.8.5 JAVA_17 level on forge/neoforge <1.21.2; 26 pack.mcmeta range form
-- [ ] Stage 3: exhaustive smoketest gate IN PROGRESS (temp\lb-gate-results.txt) + per-line old-branch retirement
-- [ ] Stage 4: cleanup, READMEs, push; publish HELD
+- [x] Stage 3: exhaustive gate COMPLETE 2026-07-02 -- every claimed version booted per loader: Fabric 25/25, NeoForge 21/21 (incl the new 1.20.5 claim + the relaxed 26.1 loader floor), Forge 13/13 (Forge/1.20.5 = loader gap, Forge never shipped it). Old branches retired: origin now main + this branch only; pre-unify/* tags kept
+- [x] Stage 4: cleanup, READMEs, pushed (f99a1df + main b5ddb2c). Modrinth 1.4.0 publish = HELD, separate deliberate step
