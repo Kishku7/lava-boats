@@ -2,31 +2,30 @@
 
 **Ride lava like it's water.** Lava Boats adds **Crimson and Warped boats** (regular and chest variants) that float and steer on lava exactly like ordinary boats on water. They never burn, riders never catch fire, dropped boats bob back to the surface, and Depth Strider works in lava (1.21.11+). No custom packets - a vanilla client can still join a server running it. Client + server mod.
 
+Current version: **1.4.0**
 
-## Branches
+## Source
 
-Source is organized by Minecraft line. Every loader+version folder is a **standalone, self-contained
-build** - no Architectury, no shared `Common/`. Inside each branch the code is grouped **loader-on-top**:
-`Fabric/`, `Forge/`, `NeoForge/`, each with a sub-folder per Minecraft version. `main` (this branch) is
-the overview.
+All source lives on ONE branch:
+[`minecraft-1.20-26.3`](https://github.com/Kishku7/lava-boats/tree/minecraft-1.20-26.3) --
+a single unified codebase that builds every supported Minecraft version from 1.20 through
+26.3 for every applicable loader (42 jars). One shared business source + a small
+version/loader drift brain; thin per-version build cells carry only the era's build wiring.
+`main` (this branch) is the overview page.
 
-- [1.20.x](https://github.com/Kishku7/lava-boats/tree/1.20.x) - Minecraft 1.20.1 - 1.20.6
-- [1.21.x](https://github.com/Kishku7/lava-boats/tree/1.21.x) - Minecraft 1.21 - 1.21.11
-- [26](https://github.com/Kishku7/lava-boats/tree/26) - Minecraft 26.1 -> 26.3-snapshot-1 (unified line; Fabric + NeoForge)
+The old per-line branches (`1.20.x`, `1.21.x`, `26`) are retired -- their history is
+preserved in the unified branch's ancestry and the `pre-unify/*` tags.
 
-## Supported platforms
+## Supported platforms (1.4.0)
 
-| MC line | Fabric / Quilt | Forge | NeoForge |
-| --- | --- | --- | --- |
-| `1.20.x` (1.20.1 - 1.20.6)  | 1.20.1 - 1.20.6 (+ Quilt)  | 1.20.1, 1.20.5 - 1.20.6 | 1.20.1 - 1.20.6 (incl. 1.20.2 - 1.20.4) |
-| `1.21.x` (1.21 - 1.21.11)   | 1.21 - 1.21.11 (+ Quilt)   | 1.21 - 1.21.8 | 1.21 - 1.21.11 |
-| `26` (unified 26.x) | 26.1 -> 26.3-snapshot-1 | - | 26.1.2 / 26.2 |
+| Loader | Versions |
+| --- | --- |
+| Fabric (+ Quilt pre-26) | 1.20 - 1.20.6, 1.21 - 1.21.11, 26.1, 26.2, 26.3 |
+| Forge | 1.20.1 - 1.21.8 (FG6 ceiling; Forge shipped no 1.20.5 or 1.21.2) |
+| NeoForge | 1.20.1 - 1.21.11, 26.1, 26.2 (26.3 pending a NeoForge release) |
 
-- **Forge** is supported through **1.21.8** (the ForgeGradle 6 ceiling - no FG7). 1.21.9+ and all of 26.x
-  are Fabric + NeoForge. The 1.20.2 - 1.20.4 range is covered on NeoForge (a dedicated gap build); a Forge
-  build for 1.20.2 - 1.20.4 is not yet made (tracked as future work).
-- **Quilt** runs the Fabric jar on the 1.20.x / 1.21.x lines, but **not on 26.x**: Quilt retired Quilted
-  Fabric API at 26.1, so the Fabric API path Lava Boats relies on is no longer provided on Quilt there.
+- **Quilt** runs the Fabric jar on the 1.20.x / 1.21.x lines, but **not on 26.x** (Quilt
+  retired Quilted Fabric API at 26.1).
 - Fabric / Quilt builds require **Fabric API**. Every build is standalone (no Architectury).
 
 ## Using Lava Boats
