@@ -3,7 +3,7 @@
 Adds **Crimson and Warped boats** (plain + chest variants) that ride on lava exactly like
 normal boats ride on water, never burn, and protect their passengers from fire.
 
-Version: **1.4.0**
+Version: **1.4.1**
 
 This branch (`minecraft-1.20-26.3`) is the SOLE source: one codebase builds every
 supported Minecraft version from 1.20 through 26.3 for every applicable loader --
@@ -46,11 +46,10 @@ pwsh -File scripts\cog-gen.ps1 -Cell Fabric/1.21.8   # pre-26 only
 cd Fabric\1.21.8; .\gradlew.bat build
 
 # whole loader lines
-pwsh -File scripts\build-fabric.ps1        # pre-26 Fabric cells -> dist/
-pwsh -File scripts\build-fabric-26.ps1     # 26.1 26.2 26.3 -> dist/
-pwsh -File scripts\build-neoforge.ps1
-pwsh -File scripts\build-neoforge-26.ps1
-pwsh -File scripts\build-forge.ps1
+pwsh -File scripts\build-fabric.ps1     # every Fabric jar (pre-26 cells + the 26 line) -> dist/
+pwsh -File scripts\build-neoforge.ps1   # every NeoForge jar -> dist/
+pwsh -File scripts\build-forge.ps1      # every Forge jar -> dist/
+pwsh -File scripts\check-sync.ps1       # drift tripwire: cog sources vs plain 26-cell twins
 ```
 
 Requires JDK 21 (pre-26 cells; 17-target lines compile with `--release 17`) and JDK 25

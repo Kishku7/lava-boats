@@ -3,7 +3,7 @@
   "id": "lavaboats",
   "version": "${version}",
   "name": "Lava Boats",
-  "description": "Adds Crimson and Warped boats (with chest variants) that ride on lava like water, never burn, and protect their passengers from fire.",
+  "description": "Adds Crimson and Warped boats (with chest variants) that ride on lava like water, never burn, and protect their passengers from fire. Install on the server for the protection features; install on clients for full lava-riding capability.",
   "authors": ["Kishku7"],
   "contact": {
     "homepage": "https://modrinth.com/mod/lava-boats",

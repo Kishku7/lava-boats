@@ -2,10 +2,10 @@
 
 Builds the `+26.1` / `+26.2` / `+26.3` Fabric jars directly from `../../shared_minecraft`
 (no cog; the 26 cells never run the preprocessor). Matrix + per-line deps and pack formats
-live in `../../scripts/build-fabric-26.ps1` -- always build through it:
+live in `../../scripts/build-fabric.ps1` -- always build through it:
 
 ```powershell
-pwsh -File ..\..\scripts\build-fabric-26.ps1 26.1 26.2 26.3
+pwsh -File ..\..\scripts\build-fabric.ps1 26.1 26.2 26.3
 ```
 
 Cell-owned: the fabric entrypoints (`fabric/`), the 26 registration seams

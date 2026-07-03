@@ -14,10 +14,13 @@ Adds Crimson and Warped boats (with chest variants) that ride on lava like water
 logoFile = "icon.png"
 
 [[mixins]]
-config = "lavaboats.mixins.json"
+config = "lavaboats-common.mixins.json"
 
 [[mixins]]
-config = "lavaboats-client.mixins.json"
+config = "lavaboats-common-client.mixins.json"
+
+[[mixins]]
+config = "lavaboats-neoforge-client.mixins.json"
 
 [[dependencies.lavaboats]]
 modId = "neoforge"

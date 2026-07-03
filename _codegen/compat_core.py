@@ -67,6 +67,7 @@ def emit_environment_imports(cog, loader):
 
 # ---- LavaBoats.RECIPES (unified List form; id built era-correct, no Platform dependency) ----
 def emit_recipes_imports(cog, loader, ver):
+    cog.outl("import java.util.List;")
     if is_legacy(ver):
         cog.outl("import net.minecraft.resources.ResourceLocation;")
     else:
@@ -78,7 +79,7 @@ def emit_recipes_imports(cog, loader, ver):
 
 def emit_recipes_block(cog, loader, ver):
     if is_legacy(ver):
-        cog.outl("public static final java.util.List<ResourceLocation> RECIPES = java.util.List.of(")
+        cog.outl("public static final List<ResourceLocation> RECIPES = List.of(")
         cog.outl('        recipeKey("crimson_boat"),')
         cog.outl('        recipeKey("warped_boat"),')
         cog.outl('        recipeKey("crimson_chest_boat"),')
@@ -88,7 +89,7 @@ def emit_recipes_block(cog, loader, ver):
         cog.outl("    return " + make_id(ver, "MOD_ID", "name", loader) + ";")
         cog.outl("}")
     else:
-        cog.outl("public static final java.util.List<ResourceKey<Recipe<?>>> RECIPES = java.util.List.of(")
+        cog.outl("public static final List<ResourceKey<Recipe<?>>> RECIPES = List.of(")
         cog.outl('        recipeKey("crimson_boat"),')
         cog.outl('        recipeKey("warped_boat"),')
         cog.outl('        recipeKey("crimson_chest_boat"),')
@@ -115,3 +116,63 @@ def emit_render_to_buffer(cog, ver):
         cog.outl("this.model.renderToBuffer(poseStack, vc, packedLight, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);")
     else:
         cog.outl("this.model.renderToBuffer(poseStack, vc, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);")
+
+# ---- id-type import for any file whose generated code constructs ids directly ----
+def emit_id_type_import(cog, loader, ver):
+    cog.outl("import net.minecraft.resources." + id_type(ver) + ";")
+
+
+# ---- shared client fragments: Forge and NeoForge emit IDENTICAL event-API lines ----
+LAYERS_EVENT = """        event.registerLayerDefinition(LavaBoatLayers.CRIMSON_BOAT, BoatModel::createBoatModel);
+        event.registerLayerDefinition(LavaBoatLayers.WARPED_BOAT, BoatModel::createBoatModel);
+        event.registerLayerDefinition(LavaBoatLayers.CRIMSON_CHEST_BOAT, BoatModel::createChestBoatModel);
+        event.registerLayerDefinition(LavaBoatLayers.WARPED_CHEST_BOAT, BoatModel::createChestBoatModel);"""
+
+RENDER_VANILLA_EVENT = """        event.registerEntityRenderer(ModEntities.CRIMSON_BOAT.get(), ctx -> new BoatRenderer(ctx, LavaBoatLayers.CRIMSON_BOAT));
+        event.registerEntityRenderer(ModEntities.WARPED_BOAT.get(), ctx -> new BoatRenderer(ctx, LavaBoatLayers.WARPED_BOAT));
+        event.registerEntityRenderer(ModEntities.CRIMSON_CHEST_BOAT.get(), ctx -> new BoatRenderer(ctx, LavaBoatLayers.CRIMSON_CHEST_BOAT));
+        event.registerEntityRenderer(ModEntities.WARPED_CHEST_BOAT.get(), ctx -> new BoatRenderer(ctx, LavaBoatLayers.WARPED_CHEST_BOAT));"""
+
+RENDER_LEGACY_EVENT = """        event.registerEntityRenderer(ModEntities.CRIMSON_BOAT.get(), ctx -> new LavaBoatRenderer(ctx, LavaBoatRenderer.CRIMSON, false));
+        event.registerEntityRenderer(ModEntities.WARPED_BOAT.get(), ctx -> new LavaBoatRenderer(ctx, LavaBoatRenderer.WARPED, false));
+        event.registerEntityRenderer(ModEntities.CRIMSON_CHEST_BOAT.get(), ctx -> new LavaBoatRenderer(ctx, LavaBoatRenderer.CRIMSON_CHEST, true));
+        event.registerEntityRenderer(ModEntities.WARPED_CHEST_BOAT.get(), ctx -> new LavaBoatRenderer(ctx, LavaBoatRenderer.WARPED_CHEST, true));"""
+
+
+# ---- unified boat-fluid mixin (Forge + NeoForge share the canBoatInFluid redirect; the
+# canBoatInFluid method is each loader's own patch, hence remap=false). Fabric uses the
+# separate FluidState.is redirect (BoatWaterFabricMixin). ----
+def emit_boat_fluid_mixin(cog, loader, ver):
+    cls = "BoatFluidForgeMixin" if loader == "forge" else "BoatFluidNeoForgeMixin"
+    label = "Forge" if loader == "forge" else "NeoForge"
+    bt = boat_base_type(ver)
+    pk = boat_pkg(ver)
+    body = """import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
+
+import com.kishku7.lavaboats.ModEntities;
+
+import net.minecraft.tags.FluidTags;
+import %(pkgdot)s.%(bt)s;
+import net.minecraft.world.level.material.FluidState;
+
+/** %(label)s boat buoyancy: redirect canBoatInFluid so lava counts for our boats. */
+@Mixin(%(bt)s.class)
+public abstract class %(cls)s {
+
+    @Redirect(
+            method = {"checkInWater", "isUnderwater", "getWaterLevelAbove"},
+            at = @At(value = "INVOKE",
+                    target = "L%(pkgslash)s/%(bt)s;canBoatInFluid(Lnet/minecraft/world/level/material/FluidState;)Z",
+                    remap = false)
+    )
+    private boolean lavaboats$lavaCountsForBoat(%(bt)s self, FluidState state) {
+        if (self.canBoatInFluid(state)) {
+            return true;
+        }
+        return ModEntities.isLavaBoat(self.getType()) && state.is(FluidTags.LAVA);
+    }
+}""" % {"cls": cls, "label": label, "bt": bt, "pkgdot": pk, "pkgslash": pk.replace(".", "/")}
+    for ln in body.split("\n"):
+        cog.outl(ln)

@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.kishku7.lavaboats.ModEntities;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 import net.minecraft.world.phys.Vec3;
@@ -34,7 +35,7 @@ public abstract class AbstractBoatLavaMixin {
 
     @Inject(method = "floatBoat", at = @At("HEAD"))
     private void lavaboats$raiseOnLava(CallbackInfo ci) {
-        AbstractBoat self = (AbstractBoat) (Object) this;
+        Entity self = (Entity) (Object) this;
         if (!ModEntities.isLavaBoat(self.getType())) {
             return;
         }
@@ -51,7 +52,7 @@ public abstract class AbstractBoatLavaMixin {
     @SuppressWarnings("deprecation")
     @Inject(method = "floatBoat", at = @At("TAIL"))
     private void lavaboats$bobUpFromLava(CallbackInfo ci) {
-        AbstractBoat self = (AbstractBoat) (Object) this;
+        Entity self = (Entity) (Object) this;
         if (!ModEntities.isLavaBoat(self.getType())) {
             return;
         }

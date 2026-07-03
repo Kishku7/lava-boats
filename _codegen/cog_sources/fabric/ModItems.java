@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 //[[[cog
 // import sys; sys.path.insert(0, codegen); import compat_fabric as compat
+// import compat_core; compat_core.emit_id_type_import(cog, loader, ver)
 // cog.outl("import " + compat.boat_pkg(ver) + "." + compat.boat_base_type(ver) + ";")
 // if compat.is_legacy(ver): cog.outl("import com.kishku7.lavaboats.item.LavaBoatItem;")
 //]]]

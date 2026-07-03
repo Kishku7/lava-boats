@@ -8,6 +8,9 @@ DeferredRegister/DeferredHolder native. Entrypoint + client are uniform (always 
 """
 
 
+import compat_core
+
+
 def _vt(ver):
     return tuple(int(x) for x in ver.split("-")[0].split("."))
 
@@ -87,42 +90,6 @@ def emit_register_item_method(cog, ver):
         cog.outl("    return ITEMS.register(name, () -> new BoatItem(type.get(), new Item.Properties().stacksTo(1).fireResistant().setId(key)));")
     cog.outl("}")
 
-
-# ---- recipes (legacy array vs modern List<ResourceKey>) ----
-def emit_recipes_imports(cog, ver):
-    if is_legacy(ver):
-        cog.outl("import net.minecraft.resources.ResourceLocation;")
-    else:
-        cog.outl("import net.minecraft.core.registries.Registries;")
-        cog.outl("import net.minecraft.resources.ResourceKey;")
-        cog.outl("import net.minecraft.resources." + id_type(ver) + ";")
-        cog.outl("import net.minecraft.world.item.crafting.Recipe;")
-
-
-def emit_recipes_block(cog, ver):
-    idt = id_type(ver)
-    if is_legacy(ver):
-        cog.outl("public static final ResourceLocation[] RECIPES = {")
-        cog.outl('        recipeKey("crimson_boat"),')
-        cog.outl('        recipeKey("warped_boat"),')
-        cog.outl('        recipeKey("crimson_chest_boat"),')
-        cog.outl('        recipeKey("warped_chest_boat")};')
-        cog.outl("")
-        cog.outl("private static ResourceLocation recipeKey(String name) {")
-        cog.outl("    return ResourceLocation.fromNamespaceAndPath(MOD_ID, name);")
-        cog.outl("}")
-    else:
-        cog.outl("public static final java.util.List<ResourceKey<Recipe<?>>> RECIPES = java.util.List.of(")
-        cog.outl('        recipeKey("crimson_boat"),')
-        cog.outl('        recipeKey("warped_boat"),')
-        cog.outl('        recipeKey("crimson_chest_boat"),')
-        cog.outl('        recipeKey("warped_chest_boat"));')
-        cog.outl("")
-        cog.outl("private static ResourceKey<Recipe<?>> recipeKey(String name) {")
-        cog.outl("    return ResourceKey.create(Registries.RECIPE, {0}.fromNamespaceAndPath(MOD_ID, name));".format(idt))
-        cog.outl("}")
-
-
 def recipes_unlock_arg(ver):
     # RECIPES is the unified List everywhere; below 1.20.3 the vanilla method takes an ARRAY
     # (deobf-verified: Player.awardRecipesByKey(ResourceLocation[]) on 1.20.1 AND 1.20.2).
@@ -194,18 +161,6 @@ public class LavaBoatsNeoForge {
 
 
 # ---- client (uniform mechanism; legacy custom renderer vs modern layers; BoatModel pkg @1.21.11) ----
-_LAYERS = '''        event.registerLayerDefinition(LavaBoatLayers.CRIMSON_BOAT, BoatModel::createBoatModel);
-        event.registerLayerDefinition(LavaBoatLayers.WARPED_BOAT, BoatModel::createBoatModel);
-        event.registerLayerDefinition(LavaBoatLayers.CRIMSON_CHEST_BOAT, BoatModel::createChestBoatModel);
-        event.registerLayerDefinition(LavaBoatLayers.WARPED_CHEST_BOAT, BoatModel::createChestBoatModel);'''
-_REND_V = '''        event.registerEntityRenderer(ModEntities.CRIMSON_BOAT.get(), ctx -> new BoatRenderer(ctx, LavaBoatLayers.CRIMSON_BOAT));
-        event.registerEntityRenderer(ModEntities.WARPED_BOAT.get(), ctx -> new BoatRenderer(ctx, LavaBoatLayers.WARPED_BOAT));
-        event.registerEntityRenderer(ModEntities.CRIMSON_CHEST_BOAT.get(), ctx -> new BoatRenderer(ctx, LavaBoatLayers.CRIMSON_CHEST_BOAT));
-        event.registerEntityRenderer(ModEntities.WARPED_CHEST_BOAT.get(), ctx -> new BoatRenderer(ctx, LavaBoatLayers.WARPED_CHEST_BOAT));'''
-_REND_L = '''        event.registerEntityRenderer(ModEntities.CRIMSON_BOAT.get(), ctx -> new LavaBoatRenderer(ctx, LavaBoatRenderer.CRIMSON, false));
-        event.registerEntityRenderer(ModEntities.WARPED_BOAT.get(), ctx -> new LavaBoatRenderer(ctx, LavaBoatRenderer.WARPED, false));
-        event.registerEntityRenderer(ModEntities.CRIMSON_CHEST_BOAT.get(), ctx -> new LavaBoatRenderer(ctx, LavaBoatRenderer.CRIMSON_CHEST, true));
-        event.registerEntityRenderer(ModEntities.WARPED_CHEST_BOAT.get(), ctx -> new LavaBoatRenderer(ctx, LavaBoatRenderer.WARPED_CHEST, true));'''
 
 
 def emit_client_file(cog, ver):
@@ -226,7 +181,7 @@ public final class LavaBoatsNeoForgeClient {
     private static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
 %(rend)s
     }
-}''' % {"rend": _REND_L}
+}''' % {"rend": compat_core.RENDER_LEGACY_EVENT}
     else:
         body = '''import com.kishku7.lavaboats.ModEntities;
 import com.kishku7.lavaboats.client.LavaBoatLayers;
@@ -251,41 +206,8 @@ public final class LavaBoatsNeoForgeClient {
     private static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
 %(rend)s
     }
-}''' % {"modelpkg": boat_model_pkg(ver), "layers": _LAYERS, "rend": _REND_V}
+}''' % {"modelpkg": boat_model_pkg(ver), "layers": compat_core.LAYERS_EVENT, "rend": compat_core.RENDER_VANILLA_EVENT}
     for ln in body.split("\n"):
         cog.outl(ln)
 
 
-# ---- BoatFluidNeoForgeMixin (canBoatInFluid; boat type + pkg parameterized) ----
-def emit_boat_fluid_neo(cog, ver):
-    bt = boat_base_type(ver)
-    pk = boat_pkg(ver).replace(".", "/")
-    body = '''import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
-
-import com.kishku7.lavaboats.ModEntities;
-
-import net.minecraft.tags.FluidTags;
-import %(pkgdot)s.%(bt)s;
-import net.minecraft.world.level.material.FluidState;
-
-/** NeoForge boat buoyancy: redirect canBoatInFluid so lava counts for our boats. */
-@Mixin(%(bt)s.class)
-public abstract class BoatFluidNeoForgeMixin {
-
-    @Redirect(
-            method = {"checkInWater", "isUnderwater", "getWaterLevelAbove"},
-            at = @At(value = "INVOKE",
-                    target = "L%(pkgslash)s/%(bt)s;canBoatInFluid(Lnet/minecraft/world/level/material/FluidState;)Z",
-                    remap = false)
-    )
-    private boolean lavaboats$lavaCountsForBoat(%(bt)s self, FluidState state) {
-        if (self.canBoatInFluid(state)) {
-            return true;
-        }
-        return ModEntities.isLavaBoat(self.getType()) && state.is(FluidTags.LAVA);
-    }
-}''' % {"bt": bt, "pkgdot": boat_pkg(ver), "pkgslash": pk}
-    for ln in body.split("\n"):
-        cog.outl(ln)

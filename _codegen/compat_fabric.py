@@ -10,60 +10,11 @@ Methods:
 """
 
 
+import compat_core
+
+
 def _vt(ver):
     return tuple(int(x) for x in ver.split("-")[0].split("."))
-
-
-def _is_client(loader, ver):
-    v = _vt(ver)
-    if loader == "fabric":
-        return (["net.fabricmc.api.EnvType", "net.fabricmc.loader.api.FabricLoader"],
-                "return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;")
-    if loader == "forge":
-        return (["net.minecraftforge.api.distmarker.Dist", "net.minecraftforge.fml.loading.FMLEnvironment"],
-                "return FMLEnvironment.dist == Dist.CLIENT;")
-    if loader == "neoforge":
-        if v >= (1, 21, 9):
-            return (["net.neoforged.api.distmarker.Dist", "net.neoforged.fml.loading.FMLLoader"],
-                    "return FMLLoader.getCurrent().getDist() == Dist.CLIENT;")
-        return (["net.neoforged.api.distmarker.Dist", "net.neoforged.fml.loading.FMLEnvironment"],
-                "return FMLEnvironment.dist == Dist.CLIENT;")
-    raise ValueError("unknown loader: " + loader)
-
-
-def _id_type(ver):
-    return "Identifier" if _vt(ver) >= (1, 21, 11) else "ResourceLocation"
-
-
-def _id_import(ver):
-    return "net.minecraft.resources." + _id_type(ver)
-
-
-def emit_imports(cog, loader, ver):
-    imps = set(_is_client(loader, ver)[0])
-    imps.add(_id_import(ver))
-    for imp in sorted(imps):
-        cog.outl("import {0};".format(imp))
-
-
-def emit_is_client(cog, loader, ver):
-    cog.outl(_is_client(loader, ver)[1])
-
-
-def has_rl_factory(ver):
-    # ResourceLocation.fromNamespaceAndPath exists from 1.21; 1.20.x uses the public ctor.
-    return _vt(ver) >= (1, 21)
-
-
-def emit_id_method(cog, loader, ver):
-    t = _id_type(ver)
-    cog.outl("public static {0} id(String namespace, String path) {{".format(t))
-    if has_rl_factory(ver):
-        cog.outl("    return {0}.fromNamespaceAndPath(namespace, path);".format(t))
-    else:
-        cog.outl("    return new ResourceLocation(namespace, path);")
-    cog.outl("}")
-
 
 # ---- boat package move at MC 1.21.11 (vehicle.* -> vehicle.boat.*) ----
 # Used by a one-line cog conditional on each affected import; simple names are unchanged.
@@ -94,7 +45,7 @@ def _emit(cog, lines):
 def emit_register_boat_body(cog, loader, ver):
     if is_legacy(ver):
         _emit(cog, [
-            "var id = Platform.id(LavaBoats.MOD_ID, name);",
+            "var id = " + compat_core.make_id(ver, "LavaBoats.MOD_ID", "name", "fabric") + ";",
             "EntityType<Boat> type = EntityType.Builder",
             "        .<Boat>of((t, level) -> new Boat(t, level), MobCategory.MISC)",
             "        .sized(1.375F, 0.5625F)",
@@ -105,7 +56,7 @@ def emit_register_boat_body(cog, loader, ver):
         ])
     else:
         _emit(cog, [
-            "var id = Platform.id(LavaBoats.MOD_ID, name);",
+            "var id = " + compat_core.make_id(ver, "LavaBoats.MOD_ID", "name", "fabric") + ";",
             "EntityType<Boat> type = EntityType.Builder",
             "        .<Boat>of((t, level) -> new Boat(t, level, dropItem), MobCategory.MISC)",
             "        .noLootTable()",
@@ -121,7 +72,7 @@ def emit_register_boat_body(cog, loader, ver):
 def emit_register_chest_boat_body(cog, loader, ver):
     if is_legacy(ver):
         _emit(cog, [
-            "var id = Platform.id(LavaBoats.MOD_ID, name);",
+            "var id = " + compat_core.make_id(ver, "LavaBoats.MOD_ID", "name", "fabric") + ";",
             "EntityType<ChestBoat> type = EntityType.Builder",
             "        .<ChestBoat>of((t, level) -> new ChestBoat(t, level), MobCategory.MISC)",
             "        .sized(1.375F, 0.5625F)",
@@ -132,7 +83,7 @@ def emit_register_chest_boat_body(cog, loader, ver):
         ])
     else:
         _emit(cog, [
-            "var id = Platform.id(LavaBoats.MOD_ID, name);",
+            "var id = " + compat_core.make_id(ver, "LavaBoats.MOD_ID", "name", "fabric") + ";",
             "EntityType<ChestBoat> type = EntityType.Builder",
             "        .<ChestBoat>of((t, level) -> new ChestBoat(t, level, dropItem), MobCategory.MISC)",
             "        .noLootTable()",
@@ -148,7 +99,7 @@ def emit_register_chest_boat_body(cog, loader, ver):
 def emit_register_item_method(cog, loader, ver):
     base = boat_base_type(ver)
     cog.outl("private static Item register(String name, Supplier<? extends EntityType<? extends {0}>> type) {{".format(base))
-    cog.outl("    var id = Platform.id(LavaBoats.MOD_ID, name);")
+    cog.outl("    var id = " + compat_core.make_id(ver, "LavaBoats.MOD_ID", "name", "fabric") + ";")
     if is_legacy(ver):
         cog.outl("    Item item = new LavaBoatItem(type, new Item.Properties().stacksTo(1).fireResistant());")
     else:
@@ -200,35 +151,6 @@ def emit_client_body(cog, loader, ver):
             cog.outl("EntityModelLayerRegistry.registerModelLayer(LavaBoatLayers.{0}, BoatModel::{1});".format(field, maker))
         for field, tex, chest in _BOATS:
             cog.outl("{0}.register(ModEntities.{1}, ctx -> new BoatRenderer(ctx, LavaBoatLayers.{1}));".format(reg, field))
-
-# ---- recipe-unlock API: List<ResourceLocation> (legacy) vs List<ResourceKey<Recipe<?>>> (modern) ----
-def emit_recipes_imports(cog, loader, ver):
-    if is_legacy(ver):
-        cog.outl("import net.minecraft.resources.ResourceLocation;")
-    else:
-        cog.outl("import net.minecraft.core.registries.Registries;")
-        cog.outl("import net.minecraft.resources.ResourceKey;")
-        cog.outl("import net.minecraft.world.item.crafting.Recipe;")
-
-
-def emit_recipes_block(cog, loader, ver):
-    if is_legacy(ver):
-        cog.outl("public static final List<ResourceLocation> RECIPES = List.of(")
-    else:
-        cog.outl("public static final List<ResourceKey<Recipe<?>>> RECIPES = List.of(")
-    cog.outl('        recipeKey("crimson_boat"),')
-    cog.outl('        recipeKey("warped_boat"),')
-    cog.outl('        recipeKey("crimson_chest_boat"),')
-    cog.outl('        recipeKey("warped_chest_boat"));')
-    cog.outl("")
-    if is_legacy(ver):
-        cog.outl("private static ResourceLocation recipeKey(String name) {")
-        cog.outl("    return Platform.id(MOD_ID, name);")
-        cog.outl("}")
-    else:
-        cog.outl("private static ResourceKey<Recipe<?>> recipeKey(String name) {")
-        cog.outl("    return ResourceKey.create(Registries.RECIPE, Platform.id(MOD_ID, name));")
-        cog.outl("}")
 
 # ---- fabric entrypoint: recipe-book unlock on JOIN (array API < 1.20.3; List from 1.20.3) ----
 def emit_join_unlock_imports(cog, ver):

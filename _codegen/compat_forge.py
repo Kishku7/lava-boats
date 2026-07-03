@@ -9,6 +9,9 @@ Forge is DeferredRegister-native throughout. No Identifier rename / no boat-pack
 """
 
 
+import compat_core
+
+
 def _vt(ver):
     return tuple(int(x) for x in ver.split("-")[0].split("."))
 
@@ -39,12 +42,6 @@ def bus_import(ver):
 def _emit(cog, lines):
     for ln in lines:
         cog.outl(ln)
-
-
-# ---- isClient (Forge dist gate) ----
-def emit_is_client(cog, ver):
-    cog.outl("return FMLEnvironment.dist == Dist.CLIENT;")
-
 
 # ---- ModEntities.register(busType) param ----
 def emit_entities_register(cog, ver):
@@ -93,41 +90,6 @@ def boat_base_type(ver):
     # ModItems.register param supertype: ChestBoat extends Boat pre-1.21.2, AbstractBoat after
     return "Boat" if is_legacy(ver) else "AbstractBoat"
 
-
-# ---- LavaBoats RECIPES (legacy array+Arrays.asList vs modern List<ResourceKey>) ----
-def emit_recipes_imports(cog, ver):
-    if is_legacy(ver):
-        cog.outl("import net.minecraft.resources.ResourceLocation;")
-    else:
-        cog.outl("import net.minecraft.core.registries.Registries;")
-        cog.outl("import net.minecraft.resources.ResourceKey;")
-        cog.outl("import net.minecraft.resources.ResourceLocation;")
-        cog.outl("import net.minecraft.world.item.crafting.Recipe;")
-
-
-def emit_recipes_block(cog, ver):
-    if is_legacy(ver):
-        cog.outl("public static final ResourceLocation[] RECIPES = {")
-        cog.outl('        recipeKey("crimson_boat"),')
-        cog.outl('        recipeKey("warped_boat"),')
-        cog.outl('        recipeKey("crimson_chest_boat"),')
-        cog.outl('        recipeKey("warped_chest_boat")};')
-        cog.outl("")
-        cog.outl("private static ResourceLocation recipeKey(String name) {")
-        cog.outl("    return ResourceLocation.fromNamespaceAndPath(MOD_ID, name);")
-        cog.outl("}")
-    else:
-        cog.outl("public static final java.util.List<ResourceKey<Recipe<?>>> RECIPES = java.util.List.of(")
-        cog.outl('        recipeKey("crimson_boat"),')
-        cog.outl('        recipeKey("warped_boat"),')
-        cog.outl('        recipeKey("crimson_chest_boat"),')
-        cog.outl('        recipeKey("warped_chest_boat"));')
-        cog.outl("")
-        cog.outl("private static ResourceKey<Recipe<?>> recipeKey(String name) {")
-        cog.outl("    return ResourceKey.create(Registries.RECIPE, ResourceLocation.fromNamespaceAndPath(MOD_ID, name));")
-        cog.outl("}")
-
-
 def recipes_unlock_arg(ver):
     # onPlayerJoin: player.awardRecipesByKey(<arg>). RECIPES is the unified List everywhere;
     # below 1.20.3 the vanilla method takes an ARRAY.
@@ -138,7 +100,6 @@ def recipes_unlock_arg(ver):
 
 def unlock_extra_import(ver):
     return "import net.minecraft.resources.ResourceLocation;\n" if _vt(ver) < (1, 20, 3) else ""
-
 
 
 def ctx_injected(ver):
@@ -240,22 +201,6 @@ public class LavaBoatsForge {
         cog.outl(ln)
 
 
-_LAYERS = '''        event.registerLayerDefinition(LavaBoatLayers.CRIMSON_BOAT, BoatModel::createBoatModel);
-        event.registerLayerDefinition(LavaBoatLayers.WARPED_BOAT, BoatModel::createBoatModel);
-        event.registerLayerDefinition(LavaBoatLayers.CRIMSON_CHEST_BOAT, BoatModel::createChestBoatModel);
-        event.registerLayerDefinition(LavaBoatLayers.WARPED_CHEST_BOAT, BoatModel::createChestBoatModel);'''
-
-_RENDER_VANILLA = '''        event.registerEntityRenderer(ModEntities.CRIMSON_BOAT.get(), ctx -> new BoatRenderer(ctx, LavaBoatLayers.CRIMSON_BOAT));
-        event.registerEntityRenderer(ModEntities.WARPED_BOAT.get(), ctx -> new BoatRenderer(ctx, LavaBoatLayers.WARPED_BOAT));
-        event.registerEntityRenderer(ModEntities.CRIMSON_CHEST_BOAT.get(), ctx -> new BoatRenderer(ctx, LavaBoatLayers.CRIMSON_CHEST_BOAT));
-        event.registerEntityRenderer(ModEntities.WARPED_CHEST_BOAT.get(), ctx -> new BoatRenderer(ctx, LavaBoatLayers.WARPED_CHEST_BOAT));'''
-
-_RENDER_LEGACY = '''        event.registerEntityRenderer(ModEntities.CRIMSON_BOAT.get(), ctx -> new LavaBoatRenderer(ctx, LavaBoatRenderer.CRIMSON, false));
-        event.registerEntityRenderer(ModEntities.WARPED_BOAT.get(), ctx -> new LavaBoatRenderer(ctx, LavaBoatRenderer.WARPED, false));
-        event.registerEntityRenderer(ModEntities.CRIMSON_CHEST_BOAT.get(), ctx -> new LavaBoatRenderer(ctx, LavaBoatRenderer.CRIMSON_CHEST, true));
-        event.registerEntityRenderer(ModEntities.WARPED_CHEST_BOAT.get(), ctx -> new LavaBoatRenderer(ctx, LavaBoatRenderer.WARPED_CHEST, true));'''
-
-
 def emit_client_file(cog, ver):
     if is_legacy(ver):
         body = '''import com.kishku7.lavaboats.LavaBoats;
@@ -275,7 +220,7 @@ public final class LavaBoatsForgeClient {
     public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
 %(render)s
     }
-}''' % {"render": _RENDER_LEGACY}
+}''' % {"render": compat_core.RENDER_LEGACY_EVENT}
     elif eb7(ver):
         body = '''import com.kishku7.lavaboats.ModEntities;
 import com.kishku7.lavaboats.client.LavaBoatLayers;
@@ -300,7 +245,7 @@ public final class LavaBoatsForgeClient {
     private static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
 %(render)s
     }
-}''' % {"layers": _LAYERS, "render": _RENDER_VANILLA}
+}''' % {"layers": compat_core.LAYERS_EVENT, "render": compat_core.RENDER_VANILLA_EVENT}
     else:
         body = '''import com.kishku7.lavaboats.LavaBoats;
 import com.kishku7.lavaboats.ModEntities;
@@ -326,39 +271,7 @@ public final class LavaBoatsForgeClient {
     public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
 %(render)s
     }
-}''' % {"layers": _LAYERS, "render": _RENDER_VANILLA}
+}''' % {"layers": compat_core.LAYERS_EVENT, "render": compat_core.RENDER_VANILLA_EVENT}
     for ln in body.split("\n"):
         cog.outl(ln)
 
-# ---- BoatFluidForgeMixin: targets Boat (legacy) / AbstractBoat (modern); @At FQN embeds it ----
-def emit_boat_fluid_forge(cog, ver):
-    bt = boat_base_type(ver)            # Boat (legacy) / AbstractBoat (modern)
-    body = '''import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
-
-import com.kishku7.lavaboats.ModEntities;
-
-import net.minecraft.tags.FluidTags;
-import net.minecraft.world.entity.vehicle.%(bt)s;
-import net.minecraft.world.level.material.FluidState;
-
-/** Forge boat buoyancy: redirect canBoatInFluid so lava counts for our boats. */
-@Mixin(%(bt)s.class)
-public abstract class BoatFluidForgeMixin {
-
-    @Redirect(
-            method = {"checkInWater", "isUnderwater", "getWaterLevelAbove"},
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/vehicle/%(bt)s;canBoatInFluid(Lnet/minecraft/world/level/material/FluidState;)Z",
-                    remap = false)
-    )
-    private boolean lavaboats$lavaCountsForBoat(%(bt)s self, FluidState state) {
-        if (self.canBoatInFluid(state)) {
-            return true;
-        }
-        return ModEntities.isLavaBoat(self.getType()) && state.is(FluidTags.LAVA);
-    }
-}''' % {"bt": bt}
-    for ln in body.split("\n"):
-        cog.outl(ln)

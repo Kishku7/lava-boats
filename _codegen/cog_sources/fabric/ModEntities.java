@@ -10,6 +10,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 //[[[cog
 // import sys; sys.path.insert(0, codegen); import compat_fabric as compat
+// import compat_core; compat_core.emit_id_type_import(cog, loader, ver)
 // for _n in ["Boat", "ChestBoat"]: cog.outl("import " + compat.boat_pkg(ver) + "." + _n + ";")
 //]]]
 import net.minecraft.world.entity.vehicle.boat.Boat;
