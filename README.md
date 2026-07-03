@@ -2,7 +2,7 @@
 
 **Ride lava like it's water.** Lava Boats adds **Crimson and Warped boats** (regular and chest variants) that float and steer on lava exactly like ordinary boats on water. They never burn, riders never catch fire, dropped boats bob back to the surface, and Depth Strider works in lava (1.21.11+). No custom packets - a vanilla client can still join a server running it. Client + server mod.
 
-Current version: **1.4.0**
+Current version: **1.4.1**
 
 ## Source
 
