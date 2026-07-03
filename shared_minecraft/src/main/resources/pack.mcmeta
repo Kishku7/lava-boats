@@ -1,6 +1,8 @@
 {
   "pack": {
-    "description": "lavaboats resources",
-    "pack_format": 8
+    "description": "Lava Boats resources",
+    "pack_format": ${packFormat},
+    "min_format": ${packFormat},
+    "max_format": ${packFormat}
   }
 }

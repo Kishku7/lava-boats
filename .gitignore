@@ -4,3 +4,11 @@ out/
 run/
 *.log
 dist/
+gen/
+__pycache__/
+*.pyc
+scripts/_*.txt
+scripts/_walk.out
+scripts/_walk.err
+scripts/_publish_*.py
+scripts/_release_*.py

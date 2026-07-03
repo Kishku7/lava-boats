@@ -1,34 +1,64 @@
-# Lava Boats - branch `26.2`
+# Lava Boats (Minecraft 1.20.1 - 26.3, unified source)
 
-Source for the Minecraft **26.2 (pre-release)** line. Every loader+version folder is a **standalone, self-contained
-build** - no Architectury, no shared `Common/`. Client + server mod.
+Adds **Crimson and Warped boats** (plain + chest variants) that ride on lava exactly like
+normal boats ride on water, never burn, and protect their passengers from fire.
 
-> **Pre-release line.** Modrinth **beta** only; no GitHub release until 26.2 is stable. The NeoForge build targets a local NeoForge 26.2 alpha (no public NeoForge 26.2 yet).
+Version: **1.4.0**
 
-## Platforms
+This branch (`minecraft-1.20-26.3`) is the SOLE source: one codebase builds every
+supported Minecraft version from 1.20 through 26.3 for every applicable loader --
+Fabric (+ Quilt on pre-26), Forge, and NeoForge.
 
-- [`Fabric/`](Fabric) - 1 build(s); see its README for versions and exclusions.
-- [`NeoForge/`](NeoForge) - 1 build(s); see its README for versions and exclusions.
+## Features
 
-## Not supported on this line
+- **Lava buoyancy + full water-speed steering** -- nether-stem boats float on lava and
+  steer at water speed (client + server side).
+- **Fireproof boats** -- the boats never burn or break on lava (`fireImmune` entity types).
+- **Rider safety** -- any seated passenger is fully fire-immune: no damage, no ignite,
+  no flame overlay.
+- **Floating drops** -- broken/dropped boat items are fire-resistant (Netherite-style)
+  and rise quickly to the lava surface.
+- **Depth Strider in lava** (1.21.11+, 26.x) -- the enchant's movement bonus applies to
+  lava travel like it does to water.
 
-- **Forge** is not built for the 26.x line - ForgeGradle 6 cannot build unobfuscated Minecraft 26.x and there is no FG7.
-- **Quilt** is not supported on the 26.x line - Quilt retired Quilted Fabric API at 26.1, so the Fabric API path Lava Boats uses on Fabric is no longer provided on Quilt for 26.x. (Quilt remains supported on the 1.20.x and 1.21.x branches.)
+## Platform / version coverage (42 jars from one source)
+
+| Loader | Versions |
+|--------|----------|
+| Fabric (+ Quilt pre-26) | 1.20 - 1.20.6, 1.21 - 1.21.11, 26.1, 26.2, 26.3 |
+| Forge | 1.20.1 - 1.21.8 (FG6 ceiling; no 1.21.2 Forge release) |
+| NeoForge | 1.20.1 - 1.21.11, 26.1, 26.2 (26.3 pending a NeoForge release) |
+
+## Layout
+
+| Directory | What it is |
+|-----------|------------|
+| `shared_minecraft/` | The ONE business source: shared constants, model layers, and the buoyancy / fire-immunity / item-float / depth-strider mixins, plus the 26-shaped resources. 26 cells compile it directly. |
+| `_codegen/` | The version/loader drift brain: `compat_core.py` + `compat_{fabric,forge,neoforge}.py` (Cog emitters), `boatdata.py` + `gen_resources.py` (per-version resource generation), and `cog_sources/` (the instrumented shared + per-loader files that pre-26 cells are materialized from). |
+| `Fabric/`, `Forge/`, `NeoForge/` | Thin per-version build cells (`<Loader>/<mc-ver>/`): era-correct gradle wiring + the per-cell manifest. Pre-26 cells build from a generated `gen/` tree; the `26` cells srcDir `shared_minecraft` directly. |
+| `scripts/` | `cog-gen.ps1` (materializes a cell's `gen/`), `build-{fabric,forge,neoforge}.ps1` (pre-26 cell walkers), `build-{fabric,neoforge}-26.ps1` (26-line matrix builds). All output lands in `dist/`. |
 
 ## Build
 
-```
-cd <Loader>/<version>
-./gradlew build      # Windows: .\gradlew.bat build
+```powershell
+# one cell
+pwsh -File scripts\cog-gen.ps1 -Cell Fabric/1.21.8   # pre-26 only
+cd Fabric\1.21.8; .\gradlew.bat build
+
+# whole loader lines
+pwsh -File scripts\build-fabric.ps1        # pre-26 Fabric cells -> dist/
+pwsh -File scripts\build-fabric-26.ps1     # 26.1 26.2 26.3 -> dist/
+pwsh -File scripts\build-neoforge.ps1
+pwsh -File scripts\build-neoforge-26.ps1
+pwsh -File scripts\build-forge.ps1
 ```
 
-Output: `build/libs/lava-boats-*.jar`. Requires JDK 25 (Minecraft 26.x toolchain).
+Requires JDK 21 (pre-26 cells; 17-target lines compile with `--release 17`) and JDK 25
+(26 cells), Python 3 with `cogapp` (`pip install cogapp`).
 
 ## Links
 
-- Other branches: [`1.20.x`](https://github.com/Kishku7/lava-boats/tree/1.20.x), [`1.21.x`](https://github.com/Kishku7/lava-boats/tree/1.21.x), [`26.1`](https://github.com/Kishku7/lava-boats/tree/26.1)
-- Overview: [`main`](https://github.com/Kishku7/lava-boats/tree/main)
 - Modrinth: https://modrinth.com/mod/lava-boats
-- Releases: https://github.com/Kishku7/lava-boats/releases
+- Issues: https://github.com/Kishku7/lava-boats/issues
 
 By Kishku7. All Rights Reserved.

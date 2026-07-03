@@ -1,0 +1,85 @@
+plugins {
+    id 'eclipse'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'org.spongepowered.mixin' version '0.7.+'
+}
+
+version = project.mod_version
+group = 'com.kishku7'
+base { archivesName = 'lava-boats' }
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+minecraft {
+    mappings channel: 'official', version: '1.21.4'
+    copyIdeResources = true
+}
+
+mixin {
+    add sourceSets.main, 'lavaboats.refmap.json'
+    config 'lavaboats-common.mixins.json'
+    config 'lavaboats-common-client.mixins.json'
+    config 'lavaboats-forge.mixins.json'
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.21.4-54.1.16'
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-Xlint:all'
+}
+
+// Forge 1.20.6+ runs mojmap at runtime; FG6 skips reobf so the mixin plugin's manifest wiring
+// does nothing - the MixinConfigs attribute must be explicit (all three configs).
+jar {
+    manifest {
+        attributes 'MixinConfigs': 'lavaboats-common.mixins.json,lavaboats-common-client.mixins.json,lavaboats-forge.mixins.json'
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sourceSets.main.java.srcDirs = ['gen/src/main/java']
+sourceSets.main.resources.srcDirs = ['src/main/resources', 'gen/src/main/resources']

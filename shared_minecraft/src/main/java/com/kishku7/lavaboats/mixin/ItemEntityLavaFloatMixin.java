@@ -21,6 +21,10 @@ import net.minecraft.world.phys.Vec3;
 @Mixin(ItemEntity.class)
 public abstract class ItemEntityLavaFloatMixin {
 
+    // NeoForge deprecates the vanilla TagKey fluid helpers in favour of its FluidType API; the
+    // vanilla methods are the only surface that compiles on Fabric AND Forge AND NeoForge (this
+    // file is shared across all loaders), so keep them and suppress the NeoForge-only warning.
+    @SuppressWarnings("deprecation")
     @Inject(method = "setUnderLavaMovement", at = @At("TAIL"))
     private void lavaboats$boatItemFloatsUp(CallbackInfo ci) {
         ItemEntity self = (ItemEntity) (Object) this;

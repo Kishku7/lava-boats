@@ -1,0 +1,5 @@
+build/
+.gradle/
+gen/
+run/
+_build*.log

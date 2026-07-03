@@ -1,0 +1,29 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="ARR"
+issueTrackerURL="https://github.com/Kishku7/lava-boats/issues"
+
+[[mods]]
+modId="lavaboats"
+version="${file.jarVersion}"
+displayName="Lava Boats"
+authors="Kishku7"
+logoFile="icon.png"
+description='''
+Adds Crimson and Warped boats (with chest variants) that ride on lava like water, never burn, and protect their passengers from fire. Install on the server for the protection features; install on clients for full lava-riding capability.
+'''
+
+[[dependencies.lavaboats]]
+    modId="neoforge"
+    mandatory=true
+    versionRange="[20.2,20.3)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.lavaboats]]
+    modId="minecraft"
+    mandatory=true
+    versionRange = "[1.20.2,1.20.3)"
+    ordering="NONE"
+    side="BOTH"
+

@@ -1,0 +1,31 @@
+plugins {
+    id 'eclipse'
+    id 'net.neoforged.moddev' version '2.0.141'
+}
+
+version = project.mod_version
+group = 'com.kishku7'
+base { archivesName = 'lava-boats' }
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+sourceSets.main.java.srcDir 'gen/src/main/java'
+sourceSets.main.resources.srcDirs = ['src/main/resources', 'gen/src/main/resources']
+
+neoForge {
+    version = project.neo_version
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+    options.compilerArgs << '-Xlint:all'
+}
+
+// ModDevGradle does not interpolate ${version} in neoforge.mods.toml; the loader reads the mod
+// version from the jar manifest Implementation-Version (referenced as ${file.jarVersion}).
+jar {
+    manifest {
+        attributes 'Implementation-Version': project.version
+    }
+}
