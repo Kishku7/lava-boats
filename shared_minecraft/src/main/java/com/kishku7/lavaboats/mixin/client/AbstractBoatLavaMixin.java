@@ -17,7 +17,7 @@ import net.minecraft.world.phys.Vec3;
 /**
  * Loader-agnostic part of the lava buoyancy. Runs on BOTH sides (1.1.2). The "lava counts as a
  * rideable fluid" redirect is loader-specific (NeoForge patches the boat to use {@code canBoatInFluid})
- * — see {@code BoatFluidNeoForgeMixin}.
+ * - see {@code BoatFluidNeoForgeMixin}.
  *
  * - {@code floatBoat} HEAD: a small stable boost so the rider rides above the lava surface.
  * - {@code floatBoat} TAIL: submersion recovery. Vanilla's UNDER_WATER buoyancy is only 0.01/tick,

@@ -10,7 +10,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 /**
  * Depth Strider in lava.
  *
- * At 26.x, Depth Strider no longer uses the old getDepthStrider() formula — it grants the
+ * At 26.x, Depth Strider no longer uses the old getDepthStrider() formula - it grants the
  * {@link Attributes#WATER_MOVEMENT_EFFICIENCY} attribute, and {@code travelInWater} uses that
  * attribute to cut the slowdown and raise the player's speed (which is why higher levels feel
  * faster). {@code travelInLava} is a separate path that uses a fixed 0.02 base speed and a flat
@@ -18,7 +18,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
  *
  * These two hooks make {@code travelInLava} honour that same attribute, interpolating the base
  * speed (0.02 -> walk speed) and the horizontal drag (0.5 -> 0.546, the water value) by the
- * attribute — exactly how {@code travelInWater} does it. With no Depth Strider the attribute is 0
+ * attribute - exactly how {@code travelInWater} does it. With no Depth Strider the attribute is 0
  * and both hooks return the original constant unchanged, so ordinary lava movement is untouched.
  * The three enchantment levels need no special-casing: they're already baked into the attribute.
  */

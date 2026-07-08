@@ -1,11 +1,17 @@
 """compat.py -- Forge loader/version drift brain (lava-boats unified Forge 1.21.x tree).
 
-Clusters (Forge tops at 1.21.8; no 1.21.2, no 1.21.9+):
-  legacy : 1.21, 1.21.1      pre-boat-refactor (custom subclasses -> converged to vanilla Boat + BoatDropMixin)
-  eb6    : 1.21.3 - 1.21.5    classic EventBus (IEventBus, MinecraftForge.EVENT_BUS, @Mod.EventBusSubscriber client)
-  eb7    : 1.21.6 - 1.21.8    EventBus 7.x (BusGroup, Event.getBus().addListener, constructor client register)
+Clusters (Forge 1.21 line; no 1.21.2, 1.21.9 gated beta; ceiling 1.21.11 via forge 61):
+  legacy : 1.21, 1.21.1        pre-boat-refactor (custom subclasses -> converged to vanilla Boat + BoatDropMixin)
+  eb6    : 1.21.3 - 1.21.5      classic EventBus (IEventBus, MinecraftForge.EVENT_BUS, @Mod.EventBusSubscriber client)
+  eb7    : 1.21.6 - 1.21.11     EventBus 7.x (BusGroup, Event.getBus().addListener, constructor client register)
 
-Forge is DeferredRegister-native throughout. No Identifier rename / no boat-package move (those are 1.21.11).
+Two extra axes ride on top of the eb7 cluster (both self-derived from the NeoForge brain, which
+already solved them, since Forge and NeoForge are BOTH mojmap-native at these versions):
+  eb8    @1.21.10 (forge 60+)   Forge deprecated-for-removal the static Event.getBus(BusGroup) accessor
+                                mid EventBus migration. The call still compiles + runs (1.21.10 jar boots),
+                                and Forge has published no stable public replacement yet, so we keep it and
+                                add a narrow documented @SuppressWarnings("removal") (D11 sanctioned form).
+  rename @1.21.11               ResourceLocation->Identifier; vehicle.*->vehicle.boat.*; client model->model.object.boat
 """
 
 
@@ -22,6 +28,30 @@ def is_legacy(ver):
 
 def eb7(ver):
     return _vt(ver) >= (1, 21, 6)
+
+
+def eb8(ver):
+    # Forge 60+ (MC 1.21.10 and up): static Event.getBus(BusGroup) accessor deprecated for removal.
+    return _vt(ver) >= (1, 21, 10)
+
+
+def renamed(ver):
+    # MC 1.21.11: mojmap ResourceLocation->Identifier, vehicle.*->vehicle.boat.*, client model pkg move.
+    return _vt(ver) >= (1, 21, 11)
+
+
+def id_type(ver):
+    return "Identifier" if renamed(ver) else "ResourceLocation"
+
+
+def boat_pkg(ver):
+    return "net.minecraft.world.entity.vehicle.boat" if renamed(ver) \
+        else "net.minecraft.world.entity.vehicle"
+
+
+def boat_model_pkg(ver):
+    return "net.minecraft.client.model.object.boat" if renamed(ver) \
+        else "net.minecraft.client.model"
 
 
 def cluster(ver):
@@ -59,6 +89,7 @@ def emit_items_register_bus(cog, ver):
 # ---- entity registration bodies (converged vanilla Boat both eras; drop via ctor or mixin) ----
 def emit_register_boat_body(cog, ver, kind):
     typ = "Boat" if kind == "boat" else "ChestBoat"
+    idt = id_type(ver)
     ctor = "new {0}(t, level)" if is_legacy(ver) else "new {0}(t, level, dropItem)"
     ctor = ctor.format(typ)
     cog.outl("return ENTITIES.register(name, () -> EntityType.Builder")
@@ -73,15 +104,16 @@ def emit_register_boat_body(cog, ver, kind):
     if is_legacy(ver):
         cog.outl("        .build(name));")
     else:
-        cog.outl("        .build(ResourceKey.create(Registries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(LavaBoats.MOD_ID, name))));")
+        cog.outl("        .build(ResourceKey.create(Registries.ENTITY_TYPE, {0}.fromNamespaceAndPath(LavaBoats.MOD_ID, name))));".format(idt))
 
 
 # ---- item registration body ----
 def emit_register_item_body(cog, ver):
+    idt = id_type(ver)
     if is_legacy(ver):
         cog.outl("return ITEMS.register(name, () -> new LavaBoatItem(type, new Item.Properties().stacksTo(1).fireResistant()));")
     else:
-        cog.outl("ResourceLocation id = ResourceLocation.fromNamespaceAndPath(LavaBoats.MOD_ID, name);")
+        cog.outl("{0} id = {0}.fromNamespaceAndPath(LavaBoats.MOD_ID, name);".format(idt))
         cog.outl("ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, id);")
         cog.outl("return ITEMS.register(name, () -> new BoatItem(type.get(), new Item.Properties().stacksTo(1).fireResistant().setId(key)));")
 
@@ -121,6 +153,16 @@ def ctor_arg(ver):
 def bus_expr(ver):
     return "context.getModEventBus()" if ctx_injected(ver) else "FMLJavaModLoadingContext.get().getModEventBus()"
 
+
+# eb8 (forge 60+) narrow documented removal-suppression for the deprecated static getBus(BusGroup)
+# accessor. One indented annotation line, or empty on eb7 (1.21.6-1.21.8, not yet deprecated).
+def _removal_supp(ver):
+    if eb8(ver):
+        return ('    @SuppressWarnings("removal") // Forge 60+ deprecated the static Event.getBus(BusGroup) '
+                'accessor mid EventBus migration; it still compiles + runs and Forge ships no stable '
+                'replacement yet.\n')
+    return ""
+
 # ============ entrypoint + client: whole-class emission per cluster ============
 _TABS = '''    private void onBuildTabs(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
@@ -149,7 +191,7 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 
 @Mod(LavaBoats.MOD_ID)
 public class LavaBoatsForge {
-    public LavaBoatsForge(FMLJavaModLoadingContext context) {
+%(supp)s    public LavaBoatsForge(FMLJavaModLoadingContext context) {
         BusGroup modBus = context.getModBusGroup();
         ModEntities.register(modBus);
         ModItems.register(modBus);
@@ -165,7 +207,7 @@ public class LavaBoatsForge {
             player.awardRecipesByKey(%(arg)s);
         }
     }
-}''' % {"tabs": _TABS, "arg": arg, "rlimp": unlock_extra_import(ver)}
+}''' % {"tabs": _TABS, "arg": arg, "supp": _removal_supp(ver)}
     else:
         body = '''import com.kishku7.lavaboats.LavaBoats;
 import com.kishku7.lavaboats.ModEntities;
@@ -225,7 +267,7 @@ public final class LavaBoatsForgeClient {
         body = '''import com.kishku7.lavaboats.ModEntities;
 import com.kishku7.lavaboats.client.LavaBoatLayers;
 
-import net.minecraft.client.model.BoatModel;
+import %(modelpkg)s.BoatModel;
 import net.minecraft.client.renderer.entity.BoatRenderer;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
@@ -233,7 +275,7 @@ import net.minecraftforge.eventbus.api.bus.BusGroup;
 public final class LavaBoatsForgeClient {
     private LavaBoatsForgeClient() {}
 
-    public static void register(BusGroup modBus) {
+%(supp)s    public static void register(BusGroup modBus) {
         EntityRenderersEvent.RegisterLayerDefinitions.getBus(modBus).addListener(LavaBoatsForgeClient::onRegisterLayers);
         EntityRenderersEvent.RegisterRenderers.getBus(modBus).addListener(LavaBoatsForgeClient::onRegisterRenderers);
     }
@@ -245,7 +287,8 @@ public final class LavaBoatsForgeClient {
     private static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
 %(render)s
     }
-}''' % {"layers": compat_core.LAYERS_EVENT, "render": compat_core.RENDER_VANILLA_EVENT}
+}''' % {"modelpkg": boat_model_pkg(ver), "supp": _removal_supp(ver),
+         "layers": compat_core.LAYERS_EVENT, "render": compat_core.RENDER_VANILLA_EVENT}
     else:
         body = '''import com.kishku7.lavaboats.LavaBoats;
 import com.kishku7.lavaboats.ModEntities;
@@ -274,4 +317,3 @@ public final class LavaBoatsForgeClient {
 }''' % {"layers": compat_core.LAYERS_EVENT, "render": compat_core.RENDER_VANILLA_EVENT}
     for ln in body.split("\n"):
         cog.outl(ln)
-

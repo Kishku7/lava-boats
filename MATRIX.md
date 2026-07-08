@@ -1,6 +1,6 @@
 # Lava Boats -- unified cross-version source (branch minecraft-1.20-26.3)
 
-Target: ONE source, MC 1.20.1 - 26.3, version 1.4.0 everywhere. M1/ChunkSmith pattern,
+Target: ONE source, MC 1.20.1 - 26.3, version 1.4.3 everywhere. M1/ChunkSmith pattern,
 mod_template shape (no Plugin/shared_bukkit -- LB has no plugin). Modrinth publish is a
 separate, held step. Old branches (1.20.x / 1.21.x / origin 26.1+26.2) are deleted only
 after their line passes the exhaustive smoketest gate (decision 2026-07-02).
@@ -13,9 +13,9 @@ Fabric (8 cells):
   1.21.8 (1.21.6-1.21.8)                  1.21.9 (1.21.9-1.21.10)
   1.21.11 (1.21.11)                       26 (line-keyed +26.1/+26.2/+26.3, snapshot-2)
 
-Forge (13 cells, FG6, no 1.21.2 target, ceiling 1.21.8):
+Forge (15 cells, FG6, no 1.21.2 target, 1.21.9 gated beta, ceiling 1.21.11):
   1.20.1 1.20.2 1.20.3 1.20.4 1.20.6 (JDK17 thru 1.20.4; 21 from 1.20.6)
-  1.21 1.21.1 1.21.3 1.21.4 1.21.5 1.21.6 1.21.7 1.21.8
+  1.21 1.21.1 1.21.3 1.21.4 1.21.5 1.21.6 1.21.7 1.21.8 1.21.10 1.21.11
 
 NeoForge (18 cells, MDG; NeoGradle/SRG at 1.20.1-1.20.4):
   1.20.1 1.20.2 1.20.3 1.20.4 1.20.6

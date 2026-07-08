@@ -1,6 +1,6 @@
 # build-forge.ps1 -- walk the pre-26 Forge cells: cog-gen -> gradle build -> dist/.
 # Usage: pwsh -File scripts\build-forge.ps1 [1.21.8 ...]   (no args = all pre-26 cells)
-# Forge has no 26 line (FG6 ceiling 1.21.8).
+# Forge has no 26 line (FG6 ceiling 1.21.11; 1.21.9 gated beta - skipped).
 param([Parameter(ValueFromRemainingArguments)][string[]]$Only)
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path $PSScriptRoot -Parent
@@ -8,7 +8,7 @@ $dist = Join-Path $repoRoot 'dist'
 New-Item -ItemType Directory -Force -Path $dist | Out-Null
 
 $cells = @('1.20.1','1.20.2','1.20.3','1.20.4','1.20.6',
-           '1.21','1.21.1','1.21.3','1.21.4','1.21.5','1.21.6','1.21.7','1.21.8')
+           '1.21','1.21.1','1.21.3','1.21.4','1.21.5','1.21.6','1.21.7','1.21.8','1.21.10','1.21.11')
 if ($Only) { $cells = $cells | Where-Object { $Only -contains $_ } }
 
 $prog = Join-Path $repoRoot 'scripts\_build-forge-progress.txt'

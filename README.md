@@ -3,7 +3,7 @@
 Adds **Crimson and Warped boats** (plain + chest variants) that ride on lava exactly like
 normal boats ride on water, never burn, and protect their passengers from fire.
 
-Version: **1.4.1**
+Version: **1.4.3**
 
 This branch (`minecraft-1.20-26.3`) is the SOLE source: one codebase builds every
 supported Minecraft version from 1.20 through 26.3 for every applicable loader --
@@ -21,12 +21,12 @@ Fabric (+ Quilt on pre-26), Forge, and NeoForge.
 - **Depth Strider in lava** (1.21.11+, 26.x) -- the enchant's movement bonus applies to
   lava travel like it does to water.
 
-## Platform / version coverage (42 jars from one source)
+## Platform / version coverage (44 jars from one source)
 
 | Loader | Versions |
 |--------|----------|
 | Fabric (+ Quilt pre-26) | 1.20 - 1.20.6, 1.21 - 1.21.11, 26.1, 26.2, 26.3 |
-| Forge | 1.20.1 - 1.21.8 (FG6 ceiling; no 1.21.2 Forge release) |
+| Forge | 1.20.1 - 1.21.11 (FG6 ceiling; no Forge for 1.20.5/1.21.2; 1.21.9 beta skipped) |
 | NeoForge | 1.20.1 - 1.21.11, 26.1, 26.2 (26.3 pending a NeoForge release) |
 
 ## Layout
@@ -58,6 +58,6 @@ Requires JDK 21 (pre-26 cells; 17-target lines compile with `--release 17`) and 
 ## Links
 
 - Modrinth: https://modrinth.com/mod/lava-boats
-- Issues: https://github.com/Kishku7/lava-boats/issues
+- Issues: https://github.com/Kishku7/mod_support/issues
 
 By Kishku7. All Rights Reserved.

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BoatItem;
@@ -12,12 +11,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 //[[[cog
 // import sys; sys.path.insert(0, codegen); import compat_forge as compat
+// cog.outl("import net.minecraft.resources." + compat.id_type(ver) + ";")
+// cog.outl("import " + compat.boat_pkg(ver) + "." + compat.boat_base_type(ver) + ";")
 // cog.outl("import " + compat.bus_import(ver) + ";")
-// cog.outl("import net.minecraft.world.entity.vehicle." + compat.boat_base_type(ver) + ";")
 // if compat.is_legacy(ver): cog.outl("import com.kishku7.lavaboats.item.LavaBoatItem;")
 //]]]
-import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.vehicle.AbstractBoat;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
 //[[[end]]]
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
