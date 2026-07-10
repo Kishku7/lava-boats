@@ -7,9 +7,9 @@ group = project.maven_group
 
 base { archivesName = project.archives_base_name }
 
-// Shared boat content (resources only - the loader code genuinely diverges per loader).
-sourceSets.main.java.srcDir "../../shared_minecraft/src/main/java"
-sourceSets.main.resources.srcDir "../../shared_minecraft/src/main/resources"
+// Single-source: compile the cog-generated tree (scripts/cog-gen.ps1); the 26 twin was merged out.
+sourceSets.main.java.srcDirs = ['gen/src/main/java']
+sourceSets.main.resources.srcDirs = ['src/main/resources', 'gen/src/main/resources']
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"

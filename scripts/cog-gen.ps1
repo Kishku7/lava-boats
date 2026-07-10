@@ -1,30 +1,34 @@
-# cog-gen.ps1 -- materialize a pre-26 build cell's gen/ tree from the one shared source.
+# cog-gen.ps1 -- materialize a build cell's gen/ tree from the one shared source.
 # Usage: pwsh -File scripts\cog-gen.ps1 -Cell Fabric/1.21.8
-# The 26 cells do NOT use cog-gen (they srcDir shared_minecraft directly; compat cannot affect 26).
+# Every cell -- pre-26 AND the 26 line -- runs cog-gen (the 26 twin was merged out 2026-07-09).
 # gen/ is disposable build output (gitignored). Edit ONLY _codegen/cog_sources + shared_minecraft.
 param(
     [Parameter(Mandatory)][string]$Cell,           # <Loader>/<mcver>, e.g. Fabric/1.21.8
-    [string]$SrcLoader                             # override source flavour (NeoForge 1.20.1-1.20.4 SRG cells are forge-shaped)
+    [string]$SrcLoader,                            # override source flavour (NeoForge 1.20.1-1.20.4 SRG cells are forge-shaped)
+    [string]$McVerArg                              # explicit MC version (the '26' cell dir name is not a concrete version)
 )
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $parts  = $Cell -split '[/\\]'
 $LoaderDir = $parts[0]; $McVer = $parts[1]
+if ($McVerArg) { $McVer = $McVerArg }
+$McVerNum = ($McVer -replace '-.*$','')   # 26.3-snapshot-3 -> 26.3 for version parsing
 $Loader = $LoaderDir.ToLower()                     # fabric | forge | neoforge
 if ($SrcLoader) { $Loader = $SrcLoader.ToLower() } # e.g. -SrcLoader forge for the SRG NeoForge cells
 $cg  = Join-Path $repoRoot '_codegen'
 $cs  = Join-Path $cg 'cog_sources'
-$cell = Join-Path $repoRoot ($LoaderDir + '\' + $McVer)
+$cell = Join-Path $repoRoot ($LoaderDir + '\' + $parts[1])   # path uses the literal cell dir ('26'); $McVer holds the concrete version
 if (-not (Test-Path $cell)) { throw "cell not found: $cell" }
 $gen  = Join-Path $cell 'gen'
 $pkg  = 'com\kishku7\lavaboats'
 $genJ = Join-Path $gen ('src\main\java\' + $pkg)
 $genR = Join-Path $gen 'src\main\resources'
 
-$v = [version]$McVer
+$v = [version]$McVerNum
 $legacy   = $v -lt [version]'1.21.2'               # boat-subclass era (converged via BoatDropMixin)
 $renamed  = $v -ge [version]'1.21.11'              # Identifier / vehicle.boat / depth-strider era
 $java17   = $v -lt [version]'1.20.5'               # JDK17 sub-line (1.20.1-1.20.4)
+$is26     = $v -ge [version]'26.0'                 # 26.x line (unified onto cog-gen)
 
 # ---- 1. wipe gen/, copy shared_minecraft java verbatim ----
 Remove-Item $gen -Recurse -Force -ErrorAction SilentlyContinue
@@ -51,7 +55,7 @@ if (-not $renamed) {
 }
 
 # ---- 5. resources: generated per version + textures/icon from shared ----
-& python (Join-Path $cg 'gen_resources.py') $McVer $genR
+& python (Join-Path $cg 'gen_resources.py') $McVerNum $genR
 if ($LASTEXITCODE -ne 0) { throw "gen_resources.py failed for $McVer" }
 $shR = Join-Path $repoRoot 'shared_minecraft\src\main\resources'
 New-Item -ItemType Directory -Force -Path (Join-Path $genR 'assets\lavaboats') | Out-Null
@@ -63,13 +67,19 @@ $packFormats = @{
     '1.21'=34; '1.21.1'=34; '1.21.2'=42; '1.21.3'=42; '1.21.4'=46; '1.21.5'=55;
     '1.21.6'=63; '1.21.7'=64; '1.21.8'=64; '1.21.9'=69; '1.21.10'=69; '1.21.11'=75
 }
-$pf = $packFormats[$McVer]
-if (-not $pf) { throw "no pack_format for $McVer -- extend the table (knowledge/pack-formats.md)" }
-('{"pack":{"description":"Lava Boats resources","pack_format":' + $pf + '}}') |
-    Set-Content (Join-Path $genR 'pack.mcmeta') -Encoding UTF8
+if ($is26) {
+    # 26.x: range-form (min=max=n); value injected per-26.X by processResources ${packFormat} (PACK_FORMAT env).
+    ('{"pack":{"description":"Lava Boats resources","pack_format":${packFormat},"min_format":${packFormat},"max_format":${packFormat}}}') |
+        Set-Content (Join-Path $genR 'pack.mcmeta') -Encoding UTF8
+} else {
+    $pf = $packFormats[$McVerNum]
+    if (-not $pf) { throw "no pack_format for $McVerNum -- extend the table (knowledge/pack-formats.md)" }
+    ('{"pack":{"description":"Lava Boats resources","pack_format":' + $pf + '}}') |
+        Set-Content (Join-Path $genR 'pack.mcmeta') -Encoding UTF8
+}
 
 # ---- 6. mixins jsons (single source of truth for the era rules) ----
-$compat = if ($java17 -or ($Loader -ne 'fabric' -and $legacy)) { 'JAVA_17' } else { 'JAVA_21' }   # Forge51/neo21.0 bundle Mixin 0.8.5 (max JAVA_17)
+$compat = if ($is26) { 'JAVA_25' } elseif ($java17 -or ($Loader -ne 'fabric' -and $legacy)) { 'JAVA_17' } else { 'JAVA_21' }   # 26=JAVA_25; Forge51/neo21.0 Mixin 0.8.5 (max JAVA_17)
 $mx = '"EntityFireImmuneMixin",' + "`n    " + '"ItemEntityLavaFloatMixin"'
 if ($legacy)      { $mx += ',' + "`n    " + '"BoatDropMixin"' }
 elseif ($renamed) { $mx += ',' + "`n    " + '"LavaDepthStriderMixin"' }
@@ -122,7 +132,7 @@ if ($Loader -eq 'forge' -and $java17) { $refmap = "`n  ""refmap"": ""lavaboats.r
 $env:PYTHONDONTWRITEBYTECODE = '1'
 Get-ChildItem (Join-Path $gen 'src\main\java') -Recurse -File -Filter *.java |
     Where-Object { (Get-Content $_.FullName -Raw) -match '\[\[\[cog' } | ForEach-Object {
-        & cog -r -D loader=$Loader -D ver=$McVer -D codegen=$cg $_.FullName | Out-Null
+        & cog -r -D loader=$Loader -D ver=$McVerNum -D codegen=$cg $_.FullName | Out-Null
         if ($LASTEXITCODE -ne 0) { throw ("cog failed: " + $_.FullName) }
     }
 Write-Host ("cog-gen OK: {0} (legacy={1} renamed={2} java17={3})" -f $Cell, $legacy, $renamed, $java17)

@@ -12,7 +12,7 @@ Remove-Item $prog -ErrorAction SilentlyContinue
 
 # ---- pre-26 cells (cog-materialized) ----
 $cells = @('1.20.1','1.20.6','1.21.1','1.21.5','1.21.8','1.21.9','1.21.11')
-# ---- 26 line (matrix; cell Fabric/26 srcDirs shared_minecraft directly, no cog).
+# ---- 26 line (matrix; cell Fabric/26 is now cog-driven like pre-26 -- 26 twin merged out 2026-07-09).
 #      pf = per-26.X resource pack_format (authoritative: Memory/knowledge/pack-formats.md) ----
 $matrix26 = [ordered]@{
     '26.1' = @{ mc='26.1.2';          api='0.152.1+26.1.2'; loader='0.18.6'; lo='26.1-'; hi='26.2'; pf='84' }
@@ -53,6 +53,8 @@ $cell26 = Join-Path $repoRoot 'Fabric\26'
 foreach ($v in $keys26) {
     $m = $matrix26[$v]
     Add-Content $prog "=== $v START $(Get-Date -Format HH:mm:ss) (mc=$($m.mc), pf=$($m.pf)) ==="
+    & pwsh -NoProfile -File (Join-Path $PSScriptRoot 'cog-gen.ps1') -Cell 'Fabric/26' -McVerArg $m.mc *>> $prog
+    if ($LASTEXITCODE -ne 0) { Add-Content $prog "$v COG-FAIL"; continue }
     $env:JAVA_HOME = $jdk25
     $env:PACK_FORMAT = $m.pf
     Push-Location $cell26

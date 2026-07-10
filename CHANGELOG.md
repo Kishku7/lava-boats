@@ -4,6 +4,13 @@ All notable changes to lava-boats are documented here. Format based on Keep a Ch
 Lava Boats is a Fabric/Forge/NeoForge/Quilt mod adding Crimson & Warped boats (plain + chest)
 that ride on lava like normal boats ride on water. Modrinth: hZpGaYjV. GitHub: Kishku7/lava-boats.
 
+## [1.4.4] - 2026-07-09
+### Fixed
+- Unified the MC 26 cells onto the single-source cog pipeline (D15): the 26 Fabric/NeoForge cells no longer keep hand-maintained "plain twins" of the entrypoints, ModEntities, ModItems and mixins. This fixes silent drift where the shipped 26 jars ran older entity/item code than the pre-26 jars -- the pre-26 dropItemFor/init refactor never reached the 26 twins, and check-sync.ps1 only compared 2 of ~11 twinned files so it went unnoticed.
+### Changed
+- Fabric creative-tab registration consolidated into one version-branched place (ModItems): itemgroup.v1 pre-26, creativetab.v1 CreativeModeTabEvents on 26 (the Fabric API renamed it). Client model-layer registrar EntityModelLayerRegistry -> ModelLayerRegistry, and recipe-unlock getPlayer() -> player on 26, both now cog-version-branched.
+- Retired check-sync.ps1 (the 26 twins it guarded no longer exist; 26 is fully cog-generated like every other cell).
+
 ## [1.4.3] - 2026-07-08
 ### Added
 - Forge cells 1.21.10 (forge 60.1.9) and 1.21.11 (forge 61.1.0); Forge ceiling raised from a false-claimed 1.21.8 to a real, end-to-end 1.21.11 (Forge now 15 cells; 1.21.9 stays gated).

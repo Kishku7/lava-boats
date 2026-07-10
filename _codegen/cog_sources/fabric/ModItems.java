@@ -13,6 +13,7 @@ import net.minecraft.world.entity.EntityType;
 // import compat_core; compat_core.emit_id_type_import(cog, loader, ver)
 // cog.outl("import " + compat.boat_pkg(ver) + "." + compat.boat_base_type(ver) + ";")
 // if compat.is_legacy(ver): cog.outl("import com.kishku7.lavaboats.item.LavaBoatItem;")
+// compat.emit_moditems_tab_imports(cog, ver)
 //]]]
 import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 //[[[end]]]
@@ -37,6 +38,10 @@ public final class ModItems {
         WARPED_BOAT = register("warped_boat", () -> ModEntities.WARPED_BOAT);
         WARPED_CHEST_BOAT = register("warped_chest_boat", () -> ModEntities.WARPED_CHEST_BOAT);
         TAB_ITEMS = List.of(CRIMSON_BOAT, CRIMSON_CHEST_BOAT, WARPED_BOAT, WARPED_CHEST_BOAT);
+        //[[[cog
+        // compat.emit_moditems_tab(cog, ver)
+        //]]]
+        //[[[end]]]
     }
 
     public static boolean isLavaBoatItem(ItemStack stack) {
