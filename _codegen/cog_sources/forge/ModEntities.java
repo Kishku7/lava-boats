@@ -42,12 +42,19 @@ public final class ModEntities {
     }
     //[[[end]]]
 
+    //[[[cog
+    // import compat_core; compat_core.emit_is_lava_boat(cog)
+    //]]]
     public static boolean isLavaBoat(EntityType<?> type) {
         return type == CRIMSON_BOAT.get() || type == WARPED_BOAT.get()
                 || type == CRIMSON_CHEST_BOAT.get() || type == WARPED_CHEST_BOAT.get();
     }
+    //[[[end]]]
 
     /** Drop-item lookup for the legacy drop mixin; harmless if unused on modern. */
+    //[[[cog
+    // import compat_core; compat_core.emit_drop_item_for(cog)
+    //]]]
     public static Item dropItemFor(EntityType<?> type) {
         if (type == CRIMSON_BOAT.get()) return ModItems.CRIMSON_BOAT.get();
         if (type == WARPED_BOAT.get()) return ModItems.WARPED_BOAT.get();
@@ -55,6 +62,7 @@ public final class ModEntities {
         if (type == WARPED_CHEST_BOAT.get()) return ModItems.WARPED_CHEST_BOAT.get();
         return null;
     }
+    //[[[end]]]
 
     private static RegistryObject<EntityType<Boat>> registerBoat(String name, Supplier<Item> dropItem) {
         //[[[cog

@@ -176,3 +176,55 @@ public abstract class %(cls)s {
 }""" % {"cls": cls, "label": label, "bt": bt, "pkgdot": pk, "pkgslash": pk.replace(".", "/")}
     for ln in body.split("\n"):
         cog.outl(ln)
+
+
+# ---- entity/item bodies IDENTICAL across Forge + NeoForge (both hold via RegistryObject/DeferredHolder,
+# so they read the value with .get()). Single source here; both loader brains delegate emit_register_boat_body
+# and the cog_sources emit the three method bodies directly via these. NOTE: Fabric is intentionally NOT a
+# consumer -- its twins use plain static-field access (no .get()) and a different register-body signature. ----
+def emit_register_boat_body(cog, ver, kind):
+    typ = "Boat" if kind == "boat" else "ChestBoat"
+    idt = id_type(ver)
+    ctor = "new {0}(t, level)" if is_legacy(ver) else "new {0}(t, level, dropItem)"
+    ctor = ctor.format(typ)
+    cog.outl("return ENTITIES.register(name, () -> EntityType.Builder")
+    cog.outl("        .<{0}>of((t, level) -> {1}, MobCategory.MISC)".format(typ, ctor))
+    if not is_legacy(ver):
+        cog.outl("        .noLootTable()")
+    cog.outl("        .sized(1.375F, 0.5625F)")
+    if not is_legacy(ver):
+        cog.outl("        .eyeHeight(0.5625F)")
+    cog.outl("        .clientTrackingRange(10)")
+    cog.outl("        .fireImmune()")
+    if is_legacy(ver):
+        cog.outl("        .build(name));")
+    else:
+        cog.outl("        .build(ResourceKey.create(Registries.ENTITY_TYPE, {0}.fromNamespaceAndPath(LavaBoats.MOD_ID, name))));".format(idt))
+
+
+def emit_is_lava_boat(cog):
+    cog.outl("public static boolean isLavaBoat(EntityType<?> type) {")
+    cog.outl("    return type == CRIMSON_BOAT.get() || type == WARPED_BOAT.get()")
+    cog.outl("            || type == CRIMSON_CHEST_BOAT.get() || type == WARPED_CHEST_BOAT.get();")
+    cog.outl("}")
+
+
+def emit_drop_item_for(cog):
+    cog.outl("public static Item dropItemFor(EntityType<?> type) {")
+    cog.outl("    if (type == CRIMSON_BOAT.get()) return ModItems.CRIMSON_BOAT.get();")
+    cog.outl("    if (type == WARPED_BOAT.get()) return ModItems.WARPED_BOAT.get();")
+    cog.outl("    if (type == CRIMSON_CHEST_BOAT.get()) return ModItems.CRIMSON_CHEST_BOAT.get();")
+    cog.outl("    if (type == WARPED_CHEST_BOAT.get()) return ModItems.WARPED_CHEST_BOAT.get();")
+    cog.outl("    return null;")
+    cog.outl("}")
+
+
+def emit_is_lava_boat_item(cog):
+    cog.outl("public static boolean isLavaBoatItem(ItemStack stack) {")
+    cog.outl("    if (stack.isEmpty()) {")
+    cog.outl("        return false;")
+    cog.outl("    }")
+    cog.outl("    Item i = stack.getItem();")
+    cog.outl("    return i == CRIMSON_BOAT.get() || i == CRIMSON_CHEST_BOAT.get()")
+    cog.outl("            || i == WARPED_BOAT.get() || i == WARPED_CHEST_BOAT.get();")
+    cog.outl("}")

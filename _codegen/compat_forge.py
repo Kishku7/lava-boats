@@ -86,25 +86,9 @@ def emit_items_register_bus(cog, ver):
     cog.outl("}")
 
 
-# ---- entity registration bodies (converged vanilla Boat both eras; drop via ctor or mixin) ----
+# ---- entity registration body: byte-identical to NeoForge -> single source in compat_core (D14 dedup) ----
 def emit_register_boat_body(cog, ver, kind):
-    typ = "Boat" if kind == "boat" else "ChestBoat"
-    idt = id_type(ver)
-    ctor = "new {0}(t, level)" if is_legacy(ver) else "new {0}(t, level, dropItem)"
-    ctor = ctor.format(typ)
-    cog.outl("return ENTITIES.register(name, () -> EntityType.Builder")
-    cog.outl("        .<{0}>of((t, level) -> {1}, MobCategory.MISC)".format(typ, ctor))
-    if not is_legacy(ver):
-        cog.outl("        .noLootTable()")
-    cog.outl("        .sized(1.375F, 0.5625F)")
-    if not is_legacy(ver):
-        cog.outl("        .eyeHeight(0.5625F)")
-    cog.outl("        .clientTrackingRange(10)")
-    cog.outl("        .fireImmune()")
-    if is_legacy(ver):
-        cog.outl("        .build(name));")
-    else:
-        cog.outl("        .build(ResourceKey.create(Registries.ENTITY_TYPE, {0}.fromNamespaceAndPath(LavaBoats.MOD_ID, name))));".format(idt))
+    compat_core.emit_register_boat_body(cog, ver, kind)
 
 
 # ---- item registration body ----

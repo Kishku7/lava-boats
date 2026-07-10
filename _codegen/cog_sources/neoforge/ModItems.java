@@ -45,6 +45,9 @@ public final class ModItems {
     }
     //[[[end]]]
 
+    //[[[cog
+    // import compat_core; compat_core.emit_is_lava_boat_item(cog)
+    //]]]
     public static boolean isLavaBoatItem(ItemStack stack) {
         if (stack.isEmpty()) {
             return false;
@@ -53,6 +56,7 @@ public final class ModItems {
         return i == CRIMSON_BOAT.get() || i == CRIMSON_CHEST_BOAT.get()
                 || i == WARPED_BOAT.get() || i == WARPED_CHEST_BOAT.get();
     }
+    //[[[end]]]
 
     //[[[cog
     // compat.emit_register_item_method(cog, ver)
