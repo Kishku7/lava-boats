@@ -1,5 +1,5 @@
-// SHARED SOURCE -- canonical location: _codegen/cog_sources/shared. Pre-26 cell gen/ copies are
-// materialized from here by scripts/cog-gen.ps1; the plain 26-shaped twin lives in shared_minecraft (keep in sync).
+// SHARED SOURCE (single source) -- canonical + ONLY home: _codegen/cog_sources/shared.
+// Every cell's gen/ copy is materialized from here by scripts/cog-gen.ps1 (no shared_minecraft java twin).
 package com.kishku7.lavaboats;
 
 //[[[cog

@@ -30,12 +30,11 @@ $renamed  = $v -ge [version]'1.21.11'              # Identifier / vehicle.boat /
 $java17   = $v -lt [version]'1.20.5'               # JDK17 sub-line (1.20.1-1.20.4)
 $is26     = $v -ge [version]'26.0'                 # 26.x line (unified onto cog-gen)
 
-# ---- 1. wipe gen/, copy shared_minecraft java verbatim ----
+# ---- 1+2. wipe gen/; lay down shared java from its ONE source (_codegen/cog_sources/shared).
+#          The old shared_minecraft/src/main/java twin was deleted 2026-07-10 (it was always
+#          overwritten by these cog copies -- dead code). shared_minecraft holds resources only now. ----
 Remove-Item $gen -Recurse -Force -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Force -Path $genJ, $genR | Out-Null
-Copy-Item (Join-Path $repoRoot ('shared_minecraft\src\main\java\' + $pkg + '\*')) $genJ -Recurse -Force
-
-# ---- 2. overwrite drift files with the cog-instrumented shared copies ----
 Copy-Item (Join-Path $cs 'shared\*') $genJ -Recurse -Force
 
 # ---- 3. loader-specific files ----
