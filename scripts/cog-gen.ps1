@@ -73,8 +73,24 @@ if ($is26) {
 } else {
     $pf = $packFormats[$McVerNum]
     if (-not $pf) { throw "no pack_format for $McVerNum -- extend the table (knowledge/pack-formats.md)" }
-    ('{"pack":{"description":"Lava Boats resources","pack_format":' + $pf + '}}') |
-        Set-Content (Join-Path $genR 'pack.mcmeta') -Encoding UTF8
+    if ($pf -gt 64) {
+        # DEAD ZONE (resource major 65-81: 1.21.9/1.21.10=69, 1.21.11=75). The client resource codec
+        # and server data codec disagree on one file, so make BOTH work (knowledge/pack-formats.md
+        # RESOLVED 2026-07-12): Fabric + NeoForge ship NO pack.mcmeta (each loader synthesises the
+        # correct per-type metadata); Forge ships the exact range on the DATA major (both codecs new-era).
+        if ($Loader -eq 'forge') {
+            $dataMajors = @{ '1.21.9'=88; '1.21.10'=88; '1.21.11'=94 }
+            $dm = $dataMajors[$McVerNum]
+            if (-not $dm) { throw "no dead-zone data-major for $McVerNum (knowledge/pack-formats.md)" }
+            ('{"pack":{"description":"Lava Boats resources","pack_format":' + $dm + ',"min_format":' + $dm + ',"max_format":' + $dm + '}}') |
+                Set-Content (Join-Path $genR 'pack.mcmeta') -Encoding UTF8
+        } else {
+            Remove-Item (Join-Path $genR 'pack.mcmeta') -Force -ErrorAction SilentlyContinue
+        }
+    } else {
+        ('{"pack":{"description":"Lava Boats resources","pack_format":' + $pf + '}}') |
+            Set-Content (Join-Path $genR 'pack.mcmeta') -Encoding UTF8
+    }
 }
 
 # ---- 6. mixins jsons (single source of truth for the era rules) ----

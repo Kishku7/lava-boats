@@ -1,4 +1,4 @@
-# build-fabric.ps1 -- ALL Fabric builds: pre-26 cells (cog-gen -> gradle) AND the 26 line (matrix).
+﻿# build-fabric.ps1 -- ALL Fabric builds: pre-26 cells (cog-gen -> gradle) AND the 26 line (matrix).
 # Usage: pwsh -File scripts\build-fabric.ps1 [1.21.8 26.2 ...]   (no args = everything)
 param([Parameter(ValueFromRemainingArguments)][string[]]$Only)
 $ErrorActionPreference = 'Stop'
@@ -17,7 +17,7 @@ $cells = @('1.20.1','1.20.6','1.21.1','1.21.5','1.21.8','1.21.9','1.21.11')
 $matrix26 = [ordered]@{
     '26.1' = @{ mc='26.1.2';          api='0.152.1+26.1.2'; loader='0.18.6'; lo='26.1-'; hi='26.2'; pf='84' }
     '26.2' = @{ mc='26.2';            api='0.152.1+26.2';   loader='0.19.3'; lo='26.2-'; hi='26.3'; pf='88' }
-    '26.3' = @{ mc='26.3-snapshot-3'; api='0.154.3+26.3';   loader='0.19.3'; lo='26.3-alpha.3'; hi='26.3-alpha.4'; pf='91' }
+    '26.3' = @{ mc='26.3-snapshot-4'; api='0.155.1+26.3';   loader='0.19.3'; lo='26.3-alpha.4'; hi='26.3-alpha.5'; pf='92' }
 }
 if ($Only) {
     $cells = $cells | Where-Object { $Only -contains $_ }
