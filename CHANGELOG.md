@@ -4,6 +4,13 @@ All notable changes to lava-boats are documented here. Format based on Keep a Ch
 Lava Boats is a Fabric/Forge/NeoForge/Quilt mod adding Crimson & Warped boats (plain + chest)
 that ride on lava like normal boats ride on water. Modrinth: hZpGaYjV. GitHub: Kishku7/lava-boats.
 
+## [1.4.5] - 2026-07-16
+### Fixed
+- D4 dead-zone (1.21.9/1.21.10/1.21.11) textures: the previous plain-int pack_format (Option C, 1.4.3) left Crimson/Warped boats UNTEXTURED on Forge/NeoForge dead-zone clients. Doctrine-correct fix that makes both the client resource codec and server data codec work: Fabric + NeoForge ship NO pack.mcmeta (each loader synthesises the correct per-type metadata); Forge ships the exact range on the DATA major (1.21.9/1.21.10 = 88, 1.21.11 = 94). Boats now render textured on all three loaders in the dead zone (client-render eyeballed on Forge 1.21.10/1.21.11, NeoForge 1.21.10/1.21.11, Fabric 1.21.9/1.21.11).
+### Changed
+- MC 26.3 Fabric cell bumped 26.3-snapshot-3 -> 26.3-snapshot-4 (fabric-api 0.155.1+26.3, loader 0.19.3, dep 26.3-alpha.4, pack_format 92).
+- Targeted release: only the 8 changed cells rebuilt + republished (Fabric 1.21.9/1.21.11/26.3, NeoForge 1.21.9/1.21.10/1.21.11, Forge 1.21.10/1.21.11); the other 36 jars remain at 1.4.4. All 8 build -Xlint:all with zero warnings.
+
 ## [1.4.4] - 2026-07-09
 ### Fixed
 - Unified the MC 26 cells onto the single-source cog pipeline (D15): the 26 Fabric/NeoForge cells no longer keep hand-maintained "plain twins" of the entrypoints, ModEntities, ModItems and mixins. This fixes silent drift where the shipped 26 jars ran older entity/item code than the pre-26 jars -- the pre-26 dropItemFor/init refactor never reached the 26 twins, and check-sync.ps1 only compared 2 of ~11 twinned files so it went unnoticed.
@@ -114,3 +121,5 @@ that ride on lava like normal boats ride on water. Modrinth: hZpGaYjV. GitHub: K
 - Published to GitHub (Kishku7/lava-boats, public) and submitted to Modrinth (hZpGaYjV, slug lava-boats, License ARR).
 ### Development
 - Iterated through beta.3 (rider switched to fireImmune while seated; float boost stabilised to +0.20, no bounce) and beta.4 (dropped boat items rise to surface) before the 1.0.0 release. Initial +0.42 float bounced; +0.20 keeps buoyancy engaged.
+
+
