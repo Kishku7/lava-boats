@@ -1,14 +1,13 @@
 # Lava Boats -- NeoForge 26-line cell
 
-Builds the `+26.1` / `+26.2` NeoForge jars (MDG) directly from `../../shared_minecraft`
-(no cog; the 26 cells never run the preprocessor). 26.3 = NeoForge loader gap. Matrix +
-per-line deps and pack formats live in `../../scripts/build-neoforge.ps1` -- always
-build through it:
+The `26` cell builds the `+26.1` / `+26.2` NeoForge (MDG) jars; 26.3 is a NeoForge loader gap.
+Like every other cell it is cog-driven: `cog-gen.ps1` materializes its `gen/` tree before Gradle
+runs. The 26 line is a per-line matrix (deps + pack formats) inside `../../scripts/build-neoforge.ps1`
+-- always build through it:
 
 ```powershell
 pwsh -File ..\..\scripts\build-neoforge.ps1 26.1 26.2
 ```
 
-Cell-owned: the neoforge entrypoints, the 26 registration seams (`ModEntities`/`ModItems`
-DeferredRegister), `BoatFluidNeoForgeMixin`, `neoforge.mods.toml` (range-templated) and
-the mixins jsons.
+Cell-owned: the era-correct NeoForge gradle wiring and `neoforge.mods.toml` (range-templated).
+The shared and per-loader source is generated from `_codegen/cog_sources`.
