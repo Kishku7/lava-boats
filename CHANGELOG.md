@@ -4,6 +4,10 @@ All notable changes to lava-boats are documented here. Format based on Keep a Ch
 Lava Boats is a Fabric/Forge/NeoForge/Quilt mod adding Crimson & Warped boats (plain + chest)
 that ride on lava like normal boats ride on water. Modrinth: hZpGaYjV. GitHub: Kishku7/lava-boats.
 
+## [1.4.6] - 2026-07-21
+### Changed
+- MC 26.3 Fabric cell bumped 26.3-snapshot-4 -> 26.3-snapshot-5 (fabric-api 0.155.3+26.3, loader 0.19.3, dep 26.3-alpha.5, pack_format 93). Loads and renders in-world on the snapshot's reworked GPU/shader ("renderpearl") pipeline with no source changes; verified on the headless client harness. Targeted release: only the 26.3 Fabric jar rebuilt + republished at 1.4.6.
+
 ## [1.4.5] - 2026-07-16
 ### Fixed
 - D4 dead-zone (1.21.9/1.21.10/1.21.11) textures: the previous plain-int pack_format (Option C, 1.4.3) left Crimson/Warped boats UNTEXTURED on Forge/NeoForge dead-zone clients. Doctrine-correct fix that makes both the client resource codec and server data codec work: Fabric + NeoForge ship NO pack.mcmeta (each loader synthesises the correct per-type metadata); Forge ships the exact range on the DATA major (1.21.9/1.21.10 = 88, 1.21.11 = 94). Boats now render textured on all three loaders in the dead zone (client-render eyeballed on Forge 1.21.10/1.21.11, NeoForge 1.21.10/1.21.11, Fabric 1.21.9/1.21.11).
