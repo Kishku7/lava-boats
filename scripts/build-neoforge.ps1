@@ -14,8 +14,8 @@ $cells = @('1.20.1','1.20.2','1.20.3','1.20.4','1.20.6',
 # ---- 26 line (matrix; cell NeoForge/26 is now cog-driven like pre-26 -- 26 twin merged out 2026-07-09).
 #      pf = per-26.X resource pack_format (authoritative: Memory/knowledge/pack-formats.md) ----
 $matrix26 = [ordered]@{
-    '26.1' = @{ mc='26.1.2'; neo='26.1.2.30-beta'; mcRange='[26.1,26.2)'; neoRange='[26.1.0-alpha,)'; pf='84' }
-    '26.2' = @{ mc='26.2';   neo='26.2.0.1-beta';  mcRange='[26.2,26.3)'; neoRange='[26.2.0-alpha,)'; pf='88' }
+    '26.1' = @{ mc='26.1.2'; neo='26.1.2.87'; mcRange='[26.1,26.2)'; neoRange='[26.1.0-alpha,)'; pf='84' }
+    '26.2' = @{ mc='26.2';   neo='26.2.0.35-beta';  mcRange='[26.2,26.3)'; neoRange='[26.2.0-alpha,)'; pf='88' }
 }
 if ($Only) {
     $cells = $cells | Where-Object { $Only -contains $_ }

@@ -4,6 +4,11 @@ All notable changes to lava-boats are documented here. Format based on Keep a Ch
 Lava Boats is a Fabric/Forge/NeoForge/Quilt mod adding Crimson & Warped boats (plain + chest)
 that ride on lava like normal boats ride on water. Modrinth: hZpGaYjV. GitHub: Kishku7/lava-boats.
 
+## [1.4.7] - 2026-07-27
+### Changed
+- NeoForge 26 cells rebuilt against the now-PUBLISHED NeoForge builds: 26.1 -> 26.1.2.87, 26.2 -> 26.2.0.35-beta (previously pinned 26.1.2.30-beta / 26.2.0.1-beta). mavenLocal() dropped from the NeoForge/26 cell - a leftover of the era when 26.2 had to be built from source, and a risk of resolving a stale local artifact over the published one.
+- No source or behaviour change. Targeted release: only the two NeoForge 26 jars rebuilt; every other cell stays at its current version. Server-boot smoketested on NeoForge 26.1.2 and 26.2 with the new loaders; -Xlint:all clean.
+
 ## [1.4.6] - 2026-07-21
 ### Changed
 - MC 26.3 Fabric cell bumped 26.3-snapshot-4 -> 26.3-snapshot-5 (fabric-api 0.155.3+26.3, loader 0.19.3, dep 26.3-alpha.5, pack_format 93). Loads and renders in-world on the snapshot's reworked GPU/shader ("renderpearl") pipeline with no source changes; verified on the headless client harness. Targeted release: only the 26.3 Fabric jar rebuilt + republished at 1.4.6.
