@@ -1,4 +1,4 @@
-# cog-gen.ps1 -- materialize a build cell's gen/ tree from the one shared source.
+﻿# cog-gen.ps1 -- materialize a build cell's gen/ tree from the one shared source.
 # Usage: pwsh -File scripts\cog-gen.ps1 -Cell Fabric/1.21.8
 # Every cell -- pre-26 AND the 26 line -- runs cog-gen (the 26 twin was merged out 2026-07-09).
 # gen/ is disposable build output (gitignored). Edit ONLY _codegen/cog_sources + shared_minecraft.
@@ -123,7 +123,7 @@ if ($Loader -eq 'forge' -and $java17) { $refmap = "`n  ""refmap"": ""lavaboats.r
   "injectors": {
     "defaultRequire": 1
   },
-  "client": [
+  "mixins": [
     "client.AbstractBoatLavaMixin"
   ]
 }
@@ -137,7 +137,7 @@ if ($Loader -eq 'forge' -and $java17) { $refmap = "`n  ""refmap"": ""lavaboats.r
   "injectors": {
     "defaultRequire": 1
   },
-  "client": [
+  "mixins": [
     "client.$(if ($Loader -eq 'fabric') { 'BoatWaterFabricMixin' } elseif ($Loader -eq 'forge') { 'BoatFluidForgeMixin' } else { 'BoatFluidNeoForgeMixin' })"
   ]
 }
