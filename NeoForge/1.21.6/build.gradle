@@ -24,8 +24,15 @@ tasks.withType(JavaCompile).configureEach {
 
 // ModDevGradle does not interpolate ${version} in neoforge.mods.toml; the loader reads the mod
 // version from the jar manifest Implementation-Version (referenced as ${file.jarVersion}).
+// D23 -- stamp the real version into the JAR MANIFEST. mods.toml declares
+// version = "${file.jarVersion}", which FML fills from Implementation-Version; without it the
+// loader reports 0.0NONE. The -forge / -neoforge filename suffix is stripped from the value.
 jar {
     manifest {
-        attributes 'Implementation-Version': project.version
+        attributes([
+            'Implementation-Title'  : 'Lava Boats',
+            'Implementation-Version': project.version.toString().replaceAll(/-(neo)?forge$/, ''),
+            'Implementation-Vendor' : 'Kishku7'
+        ])
     }
 }

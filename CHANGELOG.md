@@ -29,6 +29,13 @@ that ride on lava like normal boats ride on water. Modrinth: hZpGaYjV. GitHub: K
   application could pass silently; all three are now mandatory.
 - Full 44-jar matrix rebuilt (Fabric 10 / Forge 15 / NeoForge 19), `-Xlint:all` clean, zero javac
   warnings.
+- **D23 -- the loader now reports the real mod version.** Forge and early-NeoForge cells declare
+  `version = "${file.jarVersion}"` in mods.toml, which FML fills from the jar manifest's
+  `Implementation-Version`; that attribute was never written, so 18 cells reported `0.0NONE` to the
+  loader and Forge/NeoForge 1.20.6 reported a stale hardcoded `1.2.0`. Every Forge and NeoForge cell
+  now stamps `Implementation-Title` / `Implementation-Version` / `Implementation-Vendor`, with the
+  `-forge` / `-neoforge` filename suffix stripped from the value. Caught by the pre-publish metadata
+  gate, which lava-boats had never been run through before.
 
 ### Testing
 - New **float gate** (`Server_Tests/lavaboat-float-gate/` on the harness) -- a server-side BEHAVIOUR
