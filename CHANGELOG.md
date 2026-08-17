@@ -4,6 +4,43 @@ All notable changes to lava-boats are documented here. Format based on Keep a Ch
 Lava Boats is a Fabric/Forge/NeoForge/Quilt mod adding Crimson & Warped boats (plain + chest)
 that ride on lava like normal boats ride on water. Modrinth: hZpGaYjV. GitHub: Kishku7/lava-boats.
 
+## [1.4.10] - 2026-08-17
+
+### Fixed
+- **Lava boats sank on dedicated servers.** The two mixins that create lava buoyancy --
+  `AbstractBoatLavaMixin` (the float boost and resurface bob) and the per-loader fluid hook
+  (`BoatWaterFabricMixin` / `BoatFluidForgeMixin` / `BoatFluidNeoForgeMixin`) -- were registered
+  under the `"client"` key of their mixin configs, so Mixin skipped them entirely in a SERVER
+  environment. On a dedicated server `AbstractBoat.getStatus()` never saw lava as water, the status
+  resolved to `IN_AIR`, and `floatBoat()` applied full gravity with no float boost. Because `tick()`
+  gates `floatBoat()` on `isLocalInstanceAuthoritative()` -- true on the server whenever nobody is
+  riding -- an unridden boat fell to the bottom of the lava, and a ridden one sank as soon as
+  authority returned to the server (dismount, relog, chunk reload). Both mixins now register under
+  `"mixins"` and run in either environment.
+- Single-player was never affected, which is why this went unnoticed: an integrated server runs
+  inside the client JVM, where the client-only configs apply normally.
+- **Every jar from 1.4.0 through 1.4.9 was affected**, on all three loaders and every MC version
+  from 1.20.1 to 26.3. The mixins were common before the 1.4.0 single-source unification; that
+  commit filed them under `"client"` and silently undid the earlier multiplayer-sink fix.
+
+### Changed
+- Both fluid hooks now declare `require = 3` on their three-method `@Redirect`. Mixin's default of
+  `require = 1` accepts a single successful injection out of the three target methods, so a partial
+  application could pass silently; all three are now mandatory.
+- Full 44-jar matrix rebuilt (Fabric 10 / Forge 15 / NeoForge 19), `-Xlint:all` clean, zero javac
+  warnings.
+
+### Testing
+- New **float gate** (`Server_Tests/lavaboat-float-gate/` on the harness) -- a server-side BEHAVIOUR
+  gate in the shape of the storm and catch-up gates. It builds a stone basin, fills it with three
+  layers of lava, summons an UNRIDDEN boat above it, and asserts the boat's Y at 6s and 12s. A boot
+  smoketest cannot see this bug: the mod loads clean and logs nothing.
+- **Proven in both directions before being trusted.** Pre-fix jars report Y=101.0 (resting on the
+  basin floor, three lava layers down) on both the 1.20 `Boat` line and the 1.21.2+ `AbstractBoat`
+  line; fixed jars report Y=103.72, stable across both samples.
+- CRITICAL tier green on all three loaders: Fabric 1.20.1 / 1.21.1 / 1.21.11 / 26.1.2 / 26.2 /
+  26.3-snapshot-7, NeoForge 1.20.1 / 1.21.1 / 1.21.11 / 26.1.2, Forge 1.20.1 / 1.21.1 / 1.21.11.
+
 ## [1.4.9] - 2026-08-05
 
 ### Changed

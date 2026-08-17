@@ -165,7 +165,10 @@ public abstract class %(cls)s {
             method = {"checkInWater", "isUnderwater", "getWaterLevelAbove"},
             at = @At(value = "INVOKE",
                     target = "L%(pkgslash)s/%(bt)s;canBoatInFluid(Lnet/minecraft/world/level/material/FluidState;)Z",
-                    remap = false)
+                    remap = false),
+            // canBoatInFluid is called once in each of the three methods on the loader-patched
+            // boat class; require all three so a partial application cannot pass silently.
+            require = 3
     )
     private boolean lavaboats$lavaCountsForBoat(%(bt)s self, FluidState state) {
         if (self.canBoatInFluid(state)) {

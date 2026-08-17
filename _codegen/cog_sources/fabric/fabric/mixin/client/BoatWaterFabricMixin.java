@@ -29,7 +29,10 @@ public abstract class BoatWaterFabricMixin {
     @Redirect(
             method = {"checkInWater", "isUnderwater", "getWaterLevelAbove"},
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/material/FluidState;is(Lnet/minecraft/tags/TagKey;)Z")
+                    target = "Lnet/minecraft/world/level/material/FluidState;is(Lnet/minecraft/tags/TagKey;)Z"),
+            // One call site per method in every MC version 1.20 - 26.3; require all three so a
+            // partial application can never pass silently (defaultRequire 1 would accept 1 of 3).
+            require = 3
     )
     private boolean lavaboats$treatLavaAsWater(FluidState state, TagKey<Fluid> tag) {
         if (state.is(tag)) {
