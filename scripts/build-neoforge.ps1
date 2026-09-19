@@ -1,5 +1,5 @@
 # build-neoforge.ps1 -- ALL NeoForge builds: pre-26 cells (cog-gen -> gradle) AND the 26 line (matrix).
-# Usage: pwsh -File scripts\build-neoforge.ps1 [1.21.8 26.2 ...]   (no args = everything; no 26.3 -- loader gap)
+# Usage: pwsh -File scripts\build-neoforge.ps1 [1.21.8 26.2 26.3 ...]   (no args = everything)
 param([Parameter(ValueFromRemainingArguments)][string[]]$Only)
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path $PSScriptRoot -Parent
@@ -16,6 +16,12 @@ $cells = @('1.20.1','1.20.2','1.20.3','1.20.4','1.20.6',
 $matrix26 = [ordered]@{
     '26.1' = @{ mc='26.1.2'; neo='26.1.2.87'; mcRange='[26.1,26.2)'; neoRange='[26.1.0-alpha,)'; pf='84' }
     '26.2' = @{ mc='26.2';   neo='26.2.0.35-beta';  mcRange='[26.2,26.3)'; neoRange='[26.2.0-alpha,)'; pf='88' }
+    # 26.3 NeoForge EXISTS (26.3.0.6-beta). What blocked it was never the loader: on ModDevGradle
+    # 2.0.141 the NFRT :createMinecraftArtifacts recompile dies inside Minecraft's OWN source (NeoForge's
+    # access transformer widens HolderSet.Named.contents() to public and the widening is not propagated
+    # to the anonymous subclass HolderSet.emptyNamed returns), before a line of mod source is compiled.
+    # MDG 2.0.147 builds the identical cell clean -- see NeoForge/26/gradle.properties.
+    '26.3' = @{ mc='26.3';   neo='26.3.0.6-beta';   mcRange='[26.3,26.4)'; neoRange='[26.3.0-alpha,)'; pf='97' }
 }
 if ($Only) {
     $cells = $cells | Where-Object { $Only -contains $_ }

@@ -17,7 +17,11 @@ $cells = @('1.20.1','1.20.6','1.21.1','1.21.5','1.21.8','1.21.9','1.21.11')
 $matrix26 = [ordered]@{
     '26.1' = @{ mc='26.1.2';          api='0.152.1+26.1.2'; loader='0.18.6'; lo='26.1-'; hi='26.2'; pf='84' }
     '26.2' = @{ mc='26.2';            api='0.152.1+26.2';   loader='0.19.3'; lo='26.2-'; hi='26.3'; pf='88' }
-    '26.3' = @{ mc='26.3-snapshot-7'; api='0.156.2+26.3';   loader='0.19.3'; lo='26.3-alpha.7'; hi='26.3-alpha.8'; pf='95' }
+    # 26.3 went STABLE 2026-09-15, so the snapshot-exclusive single-build window is gone and the cell
+    # takes the ordinary closed prerelease-inclusive range every settled 26.X line uses. pack_format is
+    # 97, READ from 26.3's own resources/version.json -- the ladder ran 89,90,91,92,93,94,95 across the
+    # snapshots and then jumped TWO to 97 at pre-1, which is exactly why it is never extrapolated.
+    '26.3' = @{ mc='26.3';            api='0.161.0+26.3';   loader='0.19.5'; lo='26.3-'; hi='26.4'; pf='97' }
 }
 if ($Only) {
     $cells = $cells | Where-Object { $Only -contains $_ }
