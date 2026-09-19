@@ -60,7 +60,7 @@ $shR = Join-Path $repoRoot 'shared_minecraft\src\main\resources'
 New-Item -ItemType Directory -Force -Path (Join-Path $genR 'assets\lavaboats') | Out-Null
 Copy-Item (Join-Path $shR 'assets\lavaboats\textures') (Join-Path $genR 'assets\lavaboats\textures') -Recurse -Force
 Copy-Item (Join-Path $shR 'assets\lavaboats\icon.png') (Join-Path $genR 'assets\lavaboats\icon.png') -Force
-# ---- 5b. pack.mcmeta (per-version resource pack_format; authoritative: Memory/knowledge/pack-formats.md) ----
+# ---- 5b. pack.mcmeta (per-version resource pack_format, read from each MC version's own resources/version.json) ----
 $packFormats = @{
     '1.20.1'=15; '1.20.2'=18; '1.20.3'=22; '1.20.4'=22; '1.20.5'=32; '1.20.6'=32;
     '1.21'=34; '1.21.1'=34; '1.21.2'=42; '1.21.3'=42; '1.21.4'=46; '1.21.5'=55;

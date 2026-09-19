@@ -12,7 +12,7 @@ Remove-Item $prog -ErrorAction SilentlyContinue
 $cells = @('1.20.1','1.20.2','1.20.3','1.20.4','1.20.6',
            '1.21','1.21.1','1.21.2','1.21.3','1.21.4','1.21.5','1.21.6','1.21.7','1.21.8','1.21.9','1.21.10','1.21.11')
 # ---- 26 line (matrix; cell NeoForge/26 is now cog-driven like pre-26 -- 26 twin merged out 2026-07-09).
-#      pf = per-26.X resource pack_format (authoritative: Memory/knowledge/pack-formats.md) ----
+#      pf = per-26.X resource pack_format, READ from that MC build's own resources/version.json ----
 $matrix26 = [ordered]@{
     '26.1' = @{ mc='26.1.2'; neo='26.1.2.87'; mcRange='[26.1,26.2)'; neoRange='[26.1.0-alpha,)'; pf='84' }
     '26.2' = @{ mc='26.2';   neo='26.2.0.35-beta';  mcRange='[26.2,26.3)'; neoRange='[26.2.0-alpha,)'; pf='88' }

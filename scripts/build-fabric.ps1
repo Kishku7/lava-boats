@@ -13,7 +13,7 @@ Remove-Item $prog -ErrorAction SilentlyContinue
 # ---- pre-26 cells (cog-materialized) ----
 $cells = @('1.20.1','1.20.6','1.21.1','1.21.5','1.21.8','1.21.9','1.21.11')
 # ---- 26 line (matrix; cell Fabric/26 is now cog-driven like pre-26 -- 26 twin merged out 2026-07-09).
-#      pf = per-26.X resource pack_format (authoritative: Memory/knowledge/pack-formats.md) ----
+#      pf = per-26.X resource pack_format, READ from that MC build's own resources/version.json ----
 $matrix26 = [ordered]@{
     '26.1' = @{ mc='26.1.2';          api='0.152.1+26.1.2'; loader='0.18.6'; lo='26.1-'; hi='26.2'; pf='84' }
     '26.2' = @{ mc='26.2';            api='0.152.1+26.2';   loader='0.19.3'; lo='26.2-'; hi='26.3'; pf='88' }
