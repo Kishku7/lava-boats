@@ -5,8 +5,8 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $dist = Join-Path $repoRoot 'dist'
 New-Item -ItemType Directory -Force -Path $dist | Out-Null
-$jdk21 = 'C:\Program Files\Eclipse Adoptium\jdk-21.0.9.10-hotspot'
-$jdk25 = 'C:\Program Files\Eclipse Adoptium\jdk-25.0.1.8-hotspot'
+$jdk21 = ((Get-ChildItem 'C:\Program Files\Eclipse Adoptium' -Directory -Filter 'jdk-21.*' | Sort-Object { [version]($_.Name -replace '^jdk-|-hotspot$','') } -Descending | Select-Object -First 1).FullName)
+$jdk25 = ((Get-ChildItem 'C:\Program Files\Eclipse Adoptium' -Directory -Filter 'jdk-25.*' | Sort-Object { [version]($_.Name -replace '^jdk-|-hotspot$','') } -Descending | Select-Object -First 1).FullName)
 $prog = Join-Path $repoRoot 'scripts\_build-fabric-progress.txt'
 Remove-Item $prog -ErrorAction SilentlyContinue
 
