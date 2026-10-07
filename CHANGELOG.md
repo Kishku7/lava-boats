@@ -4,6 +4,17 @@ All notable changes to lava-boats are documented here. Format based on Keep a Ch
 Lava Boats is a Fabric/Forge/NeoForge/Quilt mod adding Crimson & Warped boats (plain + chest)
 that ride on lava like normal boats ride on water. Modrinth: hZpGaYjV. GitHub: Kishku7/lava-boats.
 
+## [1.5.1] - 2026-10-07
+
+### Fixed
+- **Boats could not be crafted on MC 1.21 and 1.21.1** (mod_support #43). The recipes shipped in
+  `data/lavaboats/recipes/`, but 1.21 renamed that folder to `recipe/` and loads nothing from the
+  old name -- no error, the boats were simply in the creative menu and nowhere in a crafting table.
+  The resource generator moved the folder at 1.21.2 together with the recipe schema change; the
+  folder actually moved one release earlier. Rebuilt cells: Fabric 1.21.1 (covers 1.21-1.21.1),
+  Forge 1.21, Forge 1.21.1, NeoForge 1.21, NeoForge 1.21.1. Every other cell keeps the version it
+  shipped.
+
 ## [1.5.0] - 2026-09-18
 
 ### Added

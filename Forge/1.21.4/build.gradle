@@ -29,7 +29,9 @@ dependencies {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-    options.compilerArgs << '-Xlint:all'
+    // The mixin annotation processor claims no javac lint categories, so -processing silences only the
+    // spurious "No processor claimed any of these annotations" warning; every other lint stays on.
+    options.compilerArgs << '-Xlint:all,-processing'
 }
 
 // Forge 1.20.6+ runs mojmap at runtime; FG6 skips reobf so the mixin plugin's manifest wiring

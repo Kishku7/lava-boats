@@ -6,8 +6,13 @@ rather than as separate hand-maintained resource trees. The .json files stay dum
 generated artifacts (no markers, never hand-edited); this code knows what each
 version needs and writes the right structure to the right path.
 
+Recipe DIR name moves at 1.21, one release before the rest (1.20.6 RecipeManager
+passes the literal "recipes"; 1.21 passes Registries.elementsDirPath(RECIPE) =
+"recipe"). An old-name dir loads with no error and no recipes, which is how the
+1.21/1.21.1 jars shipped uncraftable boats (mod_support #43):
+  recipe dir name : recipes/  (< 1.21)     ->  recipe/   (>= 1.21)
+
 Resource drift across the 1.21.2 boundary (verified against on-disk trees):
-  recipe dir name : recipes/  (< 1.21.2)   ->  recipe/   (>= 1.21.2)
   ingredient form : {"item": X} object     ->  "X" flat string
   result count    : "count": 1 present     ->  omitted
   item overrides  : assets/<ns>/items/ absent -> present
@@ -36,7 +41,7 @@ def profile(ver):
     """Return the resource-structure profile for an MC version tuple, e.g. (1,21,5)."""
     modern = ver >= (1, 21, 2)
     return {
-        "recipe_dir": "recipe" if modern else "recipes",
+        "recipe_dir": "recipe" if ver >= (1, 21) else "recipes",  # NOT the 1.21.2 schema line
         "ingredient_object": not modern,   # legacy wraps each ingredient as {"item": X}
         "result_count": not modern,         # legacy includes "count": 1
         "result_key": "id" if ver >= (1, 20, 5) else "item",  # result item->id rename at 1.20.5
