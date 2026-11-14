@@ -4,6 +4,18 @@ All notable changes to lava-boats are documented here. Format based on Keep a Ch
 Lava Boats is a Fabric/Forge/NeoForge/Quilt mod adding Crimson & Warped boats (plain + chest)
 that ride on lava like normal boats ride on water. Modrinth: hZpGaYjV. GitHub: Kishku7/lava-boats.
 
+## [1.6.0] - 2026-11-14
+
+### Changed
+- **Vanilla-style textures are now the default** (mod_support #21). The boats and their item icons
+  were 4x vanilla resolution (boat 512x256, items 128x128) and looked out of place next to vanilla
+  art. They are now the vanilla birch boat and birch boat item, recoloured to Crimson and Warped at
+  vanilla size (boat 128x64, chest boat 128x128, items 16x16), value-matched to the matching planks.
+
+### Added
+- **Optional "Lava Boats HD" resource pack** (`lava-boats-hd-pack-1.6.0.zip`) with the previous
+  high-resolution art and its PBR maps. Drop it in `resourcepacks/` and enable it to get the old look back.
+
 ## [1.5.1] - 2026-10-07
 
 ### Fixed
