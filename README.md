@@ -14,7 +14,7 @@ Craft a **Crimson** or **Warped** boat from 5 matching nether-stem planks (chest
 
 ## Source
 
-Source code: [`minecraft-1.20-26.3`](https://github.com/Kishku7/lava-boats (build guide: `BUILDING.md`)).
+Source code: [Kishku7/lava-boats](https://github.com/Kishku7/lava-boats) (build guide: `BUILDING.md`).
 
 ## Support
 
