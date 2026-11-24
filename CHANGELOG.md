@@ -4,6 +4,12 @@ All notable changes to lava-boats are documented here. Format based on Keep a Ch
 Lava Boats is a Fabric/Forge/NeoForge/Quilt mod adding Crimson & Warped boats (plain + chest)
 that ride on lava like normal boats ride on water. Modrinth: hZpGaYjV. GitHub: Kishku7/lava-boats.
 
+## [1.7.0] - 2026-11-24 (Fabric 26.4 cell only)
+
+### Added
+- **Minecraft 26.4 (pre-release 1) support on Fabric.** New 26.4 cell, pinned to 26.4-pre-1 (pack_format 104). The jar
+  accepts 26.4-pre.1 only, like every pre-release build of a new line; the other lines are not rebuilt.
+
 ## [1.6.0] - 2026-11-14
 
 ### Changed

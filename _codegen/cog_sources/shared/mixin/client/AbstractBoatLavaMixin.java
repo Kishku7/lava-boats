@@ -33,6 +33,9 @@ public abstract class AbstractBoatLavaMixin {
     @Shadow
     private double waterLevel;
 
+    // 26.4 deprecates FluidTags.WATER/LAVA but they still resolve and are the only tags that exist on every
+    // supported version; the new fluid-category tags have no pre-26.4 equivalent.
+    @SuppressWarnings("deprecation")
     @Inject(method = "floatBoat", at = @At("HEAD"))
     private void lavaboats$raiseOnLava(CallbackInfo ci) {
         Entity self = (Entity) (Object) this;

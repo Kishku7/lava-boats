@@ -34,6 +34,9 @@ public abstract class BoatWaterFabricMixin {
             // partial application can never pass silently (defaultRequire 1 would accept 1 of 3).
             require = 3
     )
+    // 26.4 deprecates FluidTags.WATER/LAVA but they still resolve and are the only tags that exist on every
+    // supported version; the new fluid-category tags have no pre-26.4 equivalent.
+    @SuppressWarnings("deprecation")
     private boolean lavaboats$treatLavaAsWater(FluidState state, TagKey<Fluid> tag) {
         if (state.is(tag)) {
             return true;

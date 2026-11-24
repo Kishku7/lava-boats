@@ -108,7 +108,11 @@ def emit_register_item_method(cog, loader, ver):
         cog.outl("    Item item = new LavaBoatItem(type, new Item.Properties().stacksTo(1).fireResistant());")
     else:
         cog.outl("    ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, id);")
-        cog.outl("    BoatItem item = new BoatItem(type.get(), new Item.Properties().stacksTo(1).fireResistant().setId(key));")
+        if _vt(ver) >= (26, 4):
+            # 26.4: BoatItem lost its EntityType argument; the boat to place rides on the item as entity_data.
+            cog.outl("    BoatItem item = new BoatItem(new Item.Properties().stacksTo(1).fireResistant().setId(key).spawns(type.get()));")
+        else:
+            cog.outl("    BoatItem item = new BoatItem(type.get(), new Item.Properties().stacksTo(1).fireResistant().setId(key));")
     cog.outl("    return Registry.register(BuiltInRegistries.ITEM, id, item);")
     cog.outl("}")
 
@@ -119,6 +123,12 @@ def uses_vanilla_renderers(ver):
     return _vt(ver) >= (1, 21, 9)
 
 
+def renderer_registry(ver):
+    # 26.4 made EntityRenderers.register private: entity renderers now live in the client registry
+    # BuiltInClientRegistries.ENTITY_RENDERER, keyed by the entity type's id.
+    return _vt(ver) >= (26, 4)
+
+
 def _renderer_registrar(ver):
     return "EntityRenderers" if uses_vanilla_renderers(ver) else "EntityRendererRegistry"
 
@@ -126,7 +136,11 @@ def _renderer_registrar(ver):
 def emit_client_imports(cog, loader, ver):
     cog.outl("import com.kishku7.lavaboats.ModEntities;")
     cog.outl("import net.fabricmc.api.ClientModInitializer;")
-    if uses_vanilla_renderers(ver):
+    if renderer_registry(ver):
+        cog.outl("import net.minecraft.client.core.registries.BuiltInClientRegistries;")
+        cog.outl("import net.minecraft.core.Registry;")
+        cog.outl("import net.minecraft.core.registries.BuiltInRegistries;")
+    elif uses_vanilla_renderers(ver):
         cog.outl("import net.minecraft.client.renderer.entity.EntityRenderers;")
     else:
         cog.outl("import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;")
@@ -155,7 +169,12 @@ def emit_client_body(cog, loader, ver):
             maker = "createChestBoatModel" if chest else "createBoatModel"
             cog.outl("{0}.registerModelLayer(LavaBoatLayers.{1}, BoatModel::{2});".format(mlr, field, maker))
         for field, tex, chest in _BOATS:
-            cog.outl("{0}.register(ModEntities.{1}, ctx -> new BoatRenderer(ctx, LavaBoatLayers.{1}));".format(reg, field))
+            if renderer_registry(ver):
+                cog.outl("Registry.register(BuiltInClientRegistries.ENTITY_RENDERER, BuiltInRegistries.ENTITY_TYPE.getKey(ModEntities.{0}),".format(field))
+                cog.outl("        (net.minecraft.client.renderer.entity.EntityRendererProvider<net.minecraft.world.entity.vehicle.boat.AbstractBoat>)")
+                cog.outl("                ctx -> new BoatRenderer(ctx, LavaBoatLayers.{0}));".format(field))
+            else:
+                cog.outl("{0}.register(ModEntities.{1}, ctx -> new BoatRenderer(ctx, LavaBoatLayers.{1}));".format(reg, field))
 
 # ---- fabric entrypoint: recipe-book unlock on JOIN (array API < 1.20.3; List from 1.20.3) ----
 def emit_join_unlock_imports(cog, ver):
