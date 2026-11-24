@@ -1,44 +1,23 @@
-# Lava Boats - Build Guide (minecraft-1.20-26.3 branch)
+# Lava Boats
 
-This branch is the SOLE source for Lava Boats: one codebase builds every supported Minecraft
-version for every applicable loader - Fabric (plus Quilt on the pre-26 lines), Forge, and NeoForge.
-For what the mod does, see the landing page: [Lava Boats](https://github.com/Kishku7/lava-boats).
-Report issues at the [mod_support hub](https://github.com/Kishku7/mod_support/issues).
+**Ride lava like it's water.** Lava Boats adds **Crimson and Warped boats** (regular and chest variants) that float and steer on lava exactly like ordinary boats on water. They never burn, riders never catch fire, dropped boats bob back to the surface, and Depth Strider works in lava. No custom packets - a vanilla client can still join a server running it. Client + server mod.
 
-## What you need installed
+Ships as a **Fabric, Forge, and NeoForge** mod (Quilt runs the Fabric jar on the pre-26 lines).
 
-- JDK 21 for the pre-26 cells (the 17-target lines compile with `--release 17`) and JDK 25 for the 26 cells.
-- Python 3 with Cog: `pip install cogapp`.
-- PowerShell 7.
+## Using Lava Boats
 
-## How to build
+Craft a **Crimson** or **Warped** boat from 5 matching nether-stem planks (chest variants: a chest + the boat); they appear in the **Tools & Utilities** creative tab. Place one on lava and ride - it floats and steers just like a boat on water.
 
-```powershell
-# one cell (materialize its gen/ tree, then build it)
-pwsh -File scripts\cog-gen.ps1 -Cell Fabric/1.21.8
-cd Fabric\1.21.8; .\gradlew.bat build
+- Boats and their riders are fully **fire-immune** while on lava; broken or dropped boats **bob back up** to the lava surface.
+- **Depth Strider** works in lava.
+- Adds 4 boat items (crimson / warped, plain + chest). No blocks, no commands, no custom packets.
 
-# whole loader lines (all output -> dist/)
-pwsh -File scripts\build-fabric.ps1      # every Fabric jar (pre-26 cells + the 26 line)
-pwsh -File scripts\build-neoforge.ps1    # every NeoForge jar
-pwsh -File scripts\build-forge.ps1       # every Forge jar
-```
+## Source
 
-## Repository layout
+Source code: [`minecraft-1.20-26.3`](https://github.com/Kishku7/lava-boats (build guide: `BUILDING.md`)).
 
-| Directory | What it is |
-|-----------|------------|
-| `shared_minecraft/` | The shared Minecraft resources - textures and the mod icon - copied into every cell's generated `gen/` resources. |
-| `_codegen/` | The version/loader drift brain: `compat_core.py` + `compat_{fabric,forge,neoforge}.py` (Cog emitters), `boatdata.py` + `gen_resources.py` (per-version resource generation), and `cog_sources/` (the instrumented shared business java + per-loader files that every cell is materialized from). |
-| `Fabric/`, `Forge/`, `NeoForge/` | Thin per-version build cells (`<Loader>/<mc-ver>/`): era-correct gradle wiring + the per-cell manifest. Every cell - pre-26 and the `26` line alike - builds from a generated `gen/` tree materialized by `cog-gen.ps1`. |
-| `scripts/` | `cog-gen.ps1` (materializes a cell's `gen/`), `build-{fabric,forge,neoforge}.ps1` (walk every cell of a loader; the `26` line is a per-line matrix inside each). All output lands in `dist/`. |
+## Support
 
-## How the code generation works
-
-One shared business source (`_codegen/cog_sources/shared`) plus the Cog drift brain (`_codegen`)
-materializes a per-cell `gen/` tree for every cell - pre-26 and the `26` line alike.
-`compat_core.py` holds the version-invariant emitters, and `compat_{fabric,forge,neoforge}.py`
-carry the per-loader drift. Resources are generated per version by `boatdata.py` + `gen_resources.py`,
-then `cog-gen.ps1` runs Cog over the materialized markers to produce each cell's build-ready source.
+Report bugs or request features at https://github.com/Kishku7/mod_support/issues
 
 By Kishku7. All Rights Reserved.
